@@ -32,31 +32,42 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored auth token and validate
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      // In a real app, validate token with backend
-      const mockUser: User = {
-        id: '1',
-        name: 'John Doe',
-        email: 'john.doe@telkomschools.sch.id',
-        role: 'user',
-        department: 'IT Department'
-      };
-      setUser(mockUser);
-    }
+    // Always start with no user logged in
+    // Remove any existing auth token to ensure fresh start
+    localStorage.removeItem('authToken');
     setIsLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
     // Mock login - in real app, call backend API
-    const mockUser: User = {
-      id: '1',
-      name: email === 'admin@telkomschools.sch.id' ? 'Admin User' : 'John Doe',
-      email,
-      role: email === 'admin@telkomschools.sch.id' ? 'admin' : 'user',
-      department: 'IT Department'
-    };
+    let mockUser: User;
+    
+    if (email === 'admin@telkomschools.sch.id' && password === 'admin123') {
+      mockUser = {
+        id: '1',
+        name: 'Admin User',
+        email: 'admin@telkomschools.sch.id',
+        role: 'admin',
+        department: 'IT Department'
+      };
+    } else if (email === 'user@telkomschools.sch.id' && password === 'user123') {
+      mockUser = {
+        id: '2',
+        name: 'John Doe',
+        email: 'user@telkomschools.sch.id',
+        role: 'user',
+        department: 'IT Department'
+      };
+    } else {
+      // For any other email, create a user account
+      mockUser = {
+        id: '3',
+        name: email.split('@')[0] || 'User',
+        email,
+        role: 'user',
+        department: 'IT Department'
+      };
+    }
     
     localStorage.setItem('authToken', 'mock-jwt-token');
     setUser(mockUser);

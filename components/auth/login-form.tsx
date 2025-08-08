@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/components/providers';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Info, User, Shield } from 'lucide-react';
 import Image from 'next/image';
 
 export function LoginForm() {
@@ -28,6 +29,11 @@ export function LoginForm() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDemoLogin = (demoEmail: string, demoPassword: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPassword);
   };
 
   return (
@@ -92,6 +98,60 @@ export function LoginForm() {
                 )}
               </Button>
             </form>
+          </CardContent>
+        </Card>
+
+        {/* Demo Credentials */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center text-sm">
+              <Info className="h-4 w-4 mr-2" />
+              Demo Credentials
+            </CardTitle>
+            <CardDescription>
+              Gunakan credential berikut untuk testing
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Shield className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-medium">Admin Account</span>
+                <Badge variant="secondary">Super User</Badge>
+              </div>
+              <div className="text-xs text-gray-600 space-y-1">
+                <div>Email: admin@telkomschools.sch.id</div>
+                <div>Password: admin123</div>
+              </div>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="w-full"
+                onClick={() => handleDemoLogin('admin@telkomschools.sch.id', 'admin123')}
+              >
+                Login sebagai Admin
+              </Button>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <User className="h-4 w-4 text-green-600" />
+                <span className="text-sm font-medium">User Account</span>
+                <Badge variant="outline">Regular User</Badge>
+              </div>
+              <div className="text-xs text-gray-600 space-y-1">
+                <div>Email: user@telkomschools.sch.id</div>
+                <div>Password: user123</div>
+              </div>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="w-full"
+                onClick={() => handleDemoLogin('user@telkomschools.sch.id', 'user123')}
+              >
+                Login sebagai User
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

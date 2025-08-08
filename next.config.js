@@ -9,15 +9,6 @@ const nextConfig = {
   images: {
     domains: ['images.unsplash.com'],
   },
-  experimental: {
-    esmExternals: false,
-  },
-  swcMinify: false,
-  compiler: {
-    removeConsole: false,
-  },
-  output: 'standalone',
-  trailingSlash: false,
 };
 
 module.exports = nextConfig;
