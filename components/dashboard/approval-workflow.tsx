@@ -5,6 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   CheckCircle2, 
   Clock, 
@@ -28,7 +32,8 @@ import {
   ArrowLeft,
   Timer,
   Target,
-  Info
+  Info,
+  Plus
 } from 'lucide-react';
 import { useAuth } from '@/components/providers';
 
@@ -79,6 +84,23 @@ export function ApprovalWorkflow() {
   const { user } = useAuth();
   const [isViewingDetail, setIsViewingDetail] = useState(false);
   const [selectedWorkflow, setSelectedWorkflow] = useState<ApprovalWorkflowItem | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<'skdp'>('skdp');
+  const [createForm, setCreateForm] = useState({
+    number: '',
+    title: '',
+    subject: '',
+    category: 'Administrasi',
+    priority: 'medium' as 'high' | 'medium' | 'low',
+    background: '',
+    legalBasis: '',
+    decisions: '',
+    effectiveDate: '',
+    signerName: '',
+    signerPosition: '',
+    recipients: '',
+    attachments: ''
+  });
 
   // Role-based permission logic
   const canApprove = (approverLevel: number, currentLevel: number) => {
@@ -93,7 +115,7 @@ export function ApprovalWorkflow() {
     return false; // Editor and Viewer cannot reject
   };
 
-  const approvalWorkflow: ApprovalWorkflowItem[] = [
+  const [workflows, setWorkflows] = useState<ApprovalWorkflowItem[]>([
     {
       id: '1',
       policyTitle: 'Revisi Kebijakan Evaluasi Pembelajaran',
@@ -229,7 +251,7 @@ Evaluasi berkala setiap semester untuk memastikan efektivitas implementasi.`,
         }
       ]
     }
-  ];
+  ]);
 
   const handleViewDetail = (workflow: ApprovalWorkflowItem) => {
     setSelectedWorkflow(workflow);
@@ -279,6 +301,69 @@ Evaluasi berkala setiap semester untuk memastikan efektivitas implementasi.`,
     }
   };
 
+  const parseLines = (text: string) => text.split('\n').map(l => l.trim()).filter(Boolean);
+
+  const generateSkdpContent = () => {
+    const backgrounds = parseLines(createForm.background);
+    const legalBases = parseLines(createForm.legalBasis);
+    const decisions = parseLines(createForm.decisions);
+
+    const menimbang = backgrounds.map((b, i) => `${String.fromCharCode(97 + i)}. ${b}`).join('\n');
+    const mengingat = legalBases.map((b, i) => `${i + 1}. ${b}`).join('\n');
+    const memutuskan = decisions.map((d, i) => `${i + 1}. ${d}`).join('\n');
+
+    const effective = createForm.effectiveDate ? new Date(createForm.effectiveDate).toLocaleDateString('id-ID') : '-';
+
+    return `SURAT KEPUTUSAN\nNomor: ${createForm.number || '......'}\n\nTENTANG\n${(createForm.title || createForm.subject || '.........').toUpperCase()}\n\nMENIMBANG:\n${menimbang || '-'}\n\nMENGINGAT:\n${mengingat || '-'}\n\nMEMUTUSKAN:\nMenetapkan:\n${memutuskan || '-'}\n\nBerlaku sejak: ${effective}\n\nDitetapkan di: ........\nPada tanggal: ${effective}\n\n${createForm.signerPosition || 'Pejabat Berwenang'}\n\n${createForm.signerName || '(...................)'}`;
+  };
+
+  const openCreateModal = () => setIsCreating(true);
+  const closeCreateModal = () => setIsCreating(false);
+
+  const saveCreate = () => {
+    const attachments = parseLines(createForm.attachments);
+    const recipients = parseLines(createForm.recipients);
+    const content = generateSkdpContent();
+
+    const now = new Date();
+    const deadline = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    const newItem: ApprovalWorkflowItem = {
+      id: String(Date.now()),
+      policyTitle: createForm.title || `SK: ${createForm.subject || 'Surat Keputusan Baru'}`,
+      submittedBy: user?.name || 'Administrator',
+      submittedDate: now.toISOString().slice(0, 10),
+      currentLevel: 1,
+      totalLevels: 3,
+      status: 'pending',
+      priority: createForm.priority,
+      category: createForm.category,
+      description: createForm.subject || 'Pengajuan Surat Keputusan (SKDP)',
+      deadline: deadline.toISOString().slice(0, 10),
+      policyContent: content + (recipients.length ? `\n\nTembusan:\n- ${recipients.join('\n- ')}` : ''),
+      attachments,
+      changeLog: [
+        { action: 'Draft Created', timestamp: now.toISOString(), user: user?.name || 'Administrator', details: 'Draft SKDP dibuat dari template' },
+        { action: 'Submitted for Approval', timestamp: now.toISOString(), user: user?.name || 'Administrator', details: 'Pengajuan dikirim untuk approval' }
+      ],
+      timeline: [
+        { event: 'Draft Created', timestamp: now.toISOString(), user: user?.name || 'Administrator', status: 'completed' },
+        { event: 'Level 1 Approval', timestamp: now.toISOString(), user: 'Approver Level 1', status: 'pending' },
+        { event: 'Level 2 Approval', timestamp: now.toISOString(), user: 'Approver Level 2', status: 'waiting' }
+      ],
+      approvers: [
+        { name: 'Approver Level 1', level: 1, status: 'pending', date: null, role: 'Kepala Bagian', department: 'Administrasi', comment: null, responseTime: null },
+        { name: 'Approver Level 2', level: 2, status: 'waiting', date: null, role: 'Wakil Kepala', department: 'Manajemen', comment: null, responseTime: null },
+        { name: 'Approver Level 3', level: 3, status: 'waiting', date: null, role: 'Kepala Sekolah', department: 'Manajemen', comment: null, responseTime: null }
+      ]
+    };
+
+    setWorkflows(prev => [newItem, ...prev]);
+    setIsCreating(false);
+    setSelectedWorkflow(newItem);
+    setIsViewingDetail(true);
+  };
+
   return (
     <>
       <div className="mb-8">
@@ -287,15 +372,21 @@ Evaluasi berkala setiap semester untuk memastikan efektivitas implementasi.`,
         
         {/* Role Information */}
         <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-          <div className="flex items-center space-x-2">
-            {user?.role === 'admin' && <Crown className="h-4 w-4 text-yellow-600" />}
-            <span className="text-sm font-medium text-gray-700">
-              Role Anda: <span className="font-semibold">
-                {user?.role === 'admin' ? 'Administrator' :
-                 user?.role === 'approver' ? 'Approver' :
-                 user?.role === 'editor' ? 'Editor' : 'Viewer'}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              {user?.role === 'admin' && <Crown className="h-4 w-4 text-yellow-600" />}
+              <span className="text-sm font-medium text-gray-700">
+                Role Anda: <span className="font-semibold">
+                  {user?.role === 'admin' ? 'Administrator' :
+                   user?.role === 'approver' ? 'Approver' :
+                   user?.role === 'editor' ? 'Editor' : 'Viewer'}
+                </span>
               </span>
-            </span>
+            </div>
+            <Button size="sm" onClick={openCreateModal}>
+              <Plus className="h-4 w-4 mr-2" />
+              Buat Pengajuan
+            </Button>
           </div>
           <p className="text-xs text-gray-600 mt-1">
             {user?.role === 'admin' ? 'Anda dapat approve/reject di semua level' :
@@ -306,7 +397,7 @@ Evaluasi berkala setiap semester untuk memastikan efektivitas implementasi.`,
       </div>
 
       <div className="space-y-6">
-        {approvalWorkflow.map((workflow) => (
+        {workflows.map((workflow) => (
           <Card key={workflow.id} className="overflow-hidden">
             <CardHeader className="bg-gray-50">
               <div className="flex items-start justify-between">
@@ -736,6 +827,131 @@ Evaluasi berkala setiap semester untuk memastikan efektivitas implementasi.`,
                 <Button variant="outline" onClick={handleCloseModal}>
                   Tutup
                 </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create (SKDP) Modal */}
+      {isCreating && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Buat Pengajuan</h2>
+                  <p className="text-sm text-gray-600">Template: SKDP (Surat Keputusan)</p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={closeCreateModal}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <Tabs defaultValue="form">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="form">Form</TabsTrigger>
+                  <TabsTrigger value="preview">Preview</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="form" className="mt-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="number">Nomor Surat</Label>
+                        <Input id="number" value={createForm.number} onChange={(e) => setCreateForm({ ...createForm, number: e.target.value })} placeholder="001/SK/TS/2024" />
+                      </div>
+                      <div>
+                        <Label htmlFor="title">Judul (Opsional)</Label>
+                        <Input id="title" value={createForm.title} onChange={(e) => setCreateForm({ ...createForm, title: e.target.value })} placeholder="Penetapan ..." />
+                      </div>
+                      <div>
+                        <Label htmlFor="subject">Perihal / Ringkasan</Label>
+                        <Input id="subject" value={createForm.subject} onChange={(e) => setCreateForm({ ...createForm, subject: e.target.value })} placeholder="Penetapan kriteria evaluasi baru" />
+                      </div>
+                      <div>
+                        <Label>Kategori</Label>
+                        <Select value={createForm.category} onValueChange={(v) => setCreateForm({ ...createForm, category: v })}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih kategori" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Administrasi">Administrasi</SelectItem>
+                            <SelectItem value="Akademik">Akademik</SelectItem>
+                            <SelectItem value="Keuangan">Keuangan</SelectItem>
+                            <SelectItem value="Umum">Umum</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Prioritas</Label>
+                        <Select value={createForm.priority} onValueChange={(v) => setCreateForm({ ...createForm, priority: v as 'high' | 'medium' | 'low' })}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih prioritas" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="high">Tinggi</SelectItem>
+                            <SelectItem value="medium">Sedang</SelectItem>
+                            <SelectItem value="low">Rendah</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="effectiveDate">Tanggal Berlaku</Label>
+                        <Input id="effectiveDate" type="date" value={createForm.effectiveDate} onChange={(e) => setCreateForm({ ...createForm, effectiveDate: e.target.value })} />
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="signerName">Nama Penandatangan</Label>
+                        <Input id="signerName" value={createForm.signerName} onChange={(e) => setCreateForm({ ...createForm, signerName: e.target.value })} placeholder="Nama Pejabat" />
+                      </div>
+                      <div>
+                        <Label htmlFor="signerPosition">Jabatan Penandatangan</Label>
+                        <Input id="signerPosition" value={createForm.signerPosition} onChange={(e) => setCreateForm({ ...createForm, signerPosition: e.target.value })} placeholder="Kepala Sekolah / Direktur" />
+                      </div>
+                      <div>
+                        <Label htmlFor="recipients">Tembusan (satu per baris)</Label>
+                        <Textarea id="recipients" rows={3} value={createForm.recipients} onChange={(e) => setCreateForm({ ...createForm, recipients: e.target.value })} placeholder={'Contoh:\n- Arsip\n- Bagian Kepegawaian'} />
+                      </div>
+                      <div>
+                        <Label htmlFor="attachments">Lampiran (satu per baris)</Label>
+                        <Textarea id="attachments" rows={3} value={createForm.attachments} onChange={(e) => setCreateForm({ ...createForm, attachments: e.target.value })} placeholder={'Contoh:\n- Draft Kebijakan.pdf\n- Daftar Hadir.docx'} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                    <div className="md:col-span-1">
+                      <Label>Menimbang (satu per baris)</Label>
+                      <Textarea rows={6} value={createForm.background} onChange={(e) => setCreateForm({ ...createForm, background: e.target.value })} placeholder={'a. Pentingnya ...\nb. Untuk meningkatkan ...'} />
+                    </div>
+                    <div className="md:col-span-1">
+                      <Label>Mengingat (satu per baris)</Label>
+                      <Textarea rows={6} value={createForm.legalBasis} onChange={(e) => setCreateForm({ ...createForm, legalBasis: e.target.value })} placeholder={'1. UU No ...\n2. Peraturan Menteri ...'} />
+                    </div>
+                    <div className="md:col-span-1">
+                      <Label>Memutuskan (satu per baris)</Label>
+                      <Textarea rows={6} value={createForm.decisions} onChange={(e) => setCreateForm({ ...createForm, decisions: e.target.value })} placeholder={'1. Menetapkan ...\n2. Menginstruksikan ...'} />
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="preview" className="mt-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Preview SKDP</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <pre className="whitespace-pre-wrap text-sm text-gray-800 bg-gray-50 p-4 rounded-lg overflow-x-auto">{generateSkdpContent()}</pre>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+
+              <div className="flex space-x-2 pt-6 border-t mt-6">
+                <Button variant="outline" onClick={closeCreateModal}>Batal</Button>
+                <Button onClick={saveCreate}>Simpan & Ajukan</Button>
               </div>
             </div>
           </div>
