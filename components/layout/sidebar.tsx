@@ -44,6 +44,7 @@ export function Sidebar({ className, activeMenuItem, onMenuItemChange }: Sidebar
     { id: 'policies', label: 'Manajemen Kebijakan', icon: FileText },
     { id: 'approval', label: 'Approval Workflow', icon: CheckSquare },
     { id: 'versions', label: 'Manajemen Versi', icon: GitBranch },
+    { id: 'meetings', label: 'Notulen Rapat', icon: Clock },
     { id: 'analytics', label: 'Pelaporan & Analitik', icon: BarChart3 },
     { id: 'users', label: 'Manajemen Pengguna', icon: Users },
     { id: 'audit', label: 'Audit Trail', icon: Activity },

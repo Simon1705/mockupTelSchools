@@ -33,7 +33,8 @@ import {
   Timer,
   Target,
   Info,
-  Plus
+  Plus,
+  Upload
 } from 'lucide-react';
 import { useAuth } from '@/components/providers';
 
@@ -65,7 +66,12 @@ interface ApprovalWorkflowItem {
   deadline: string;
   approvers: Approver[];
   policyContent?: string;
-  attachments?: string[];
+  attachments?: Array<{
+    name: string;
+    size: number;
+    type: string;
+    url?: string;
+  }>;
   changeLog?: Array<{
     action: string;
     timestamp: string;
@@ -99,7 +105,7 @@ export function ApprovalWorkflow() {
     signerName: '',
     signerPosition: '',
     recipients: '',
-    attachments: ''
+    attachments: [] as File[]
   });
 
   // Role-based permission logic
@@ -153,9 +159,21 @@ Sistem evaluasi pembelajaran saat ini memerlukan perbaikan untuk meningkatkan ku
 ## Monitoring
 Evaluasi berkala setiap semester untuk memastikan efektivitas implementasi.`,
       attachments: [
-        'Revisi_Evaluasi_Pembelajaran_v2.1.pdf',
-        'Kriteria_Penilaian_Baru.docx',
-        'Sistem_Pelaporan_v2.0.xlsx'
+        {
+          name: 'Revisi_Evaluasi_Pembelajaran_v2.1.pdf',
+          size: 2048576,
+          type: 'application/pdf'
+        },
+        {
+          name: 'Kriteria_Penilaian_Baru.docx',
+          size: 1048576,
+          type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        },
+        {
+          name: 'Sistem_Pelaporan_v2.0.xlsx',
+          size: 1536000,
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        }
       ],
       changeLog: [
         {
@@ -321,9 +339,15 @@ Evaluasi berkala setiap semester untuk memastikan efektivitas implementasi.`,
   const closeCreateModal = () => setIsCreating(false);
 
   const saveCreate = () => {
-    const attachments = parseLines(createForm.attachments);
     const recipients = parseLines(createForm.recipients);
     const content = generateSkdpContent();
+
+    // Convert File objects to attachment objects
+    const attachments = createForm.attachments.map(file => ({
+      name: file.name,
+      size: file.size,
+      type: file.type
+    }));
 
     const now = new Date();
     const deadline = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -796,8 +820,10 @@ Evaluasi berkala setiap semester untuk memastikan efektivitas implementasi.`,
                                 <div className="flex items-center space-x-3">
                                   <FileText className="h-5 w-5 text-gray-400" />
                                   <div>
-                                    <div className="font-medium">{attachment}</div>
-                                    <div className="text-sm text-gray-500">PDF • ~2.5 MB</div>
+                                    <div className="font-medium">{attachment.name}</div>
+                                    <div className="text-sm text-gray-500">
+                                      {attachment.type.split('/')[1]?.toUpperCase() || 'FILE'} • {(attachment.size / 1024 / 1024).toFixed(2)} MB
+                                    </div>
                                   </div>
                                 </div>
                                 <Button size="sm" variant="outline">
@@ -915,8 +941,56 @@ Evaluasi berkala setiap semester untuk memastikan efektivitas implementasi.`,
                         <Textarea id="recipients" rows={3} value={createForm.recipients} onChange={(e) => setCreateForm({ ...createForm, recipients: e.target.value })} placeholder={'Contoh:\n- Arsip\n- Bagian Kepegawaian'} />
                       </div>
                       <div>
-                        <Label htmlFor="attachments">Lampiran (satu per baris)</Label>
-                        <Textarea id="attachments" rows={3} value={createForm.attachments} onChange={(e) => setCreateForm({ ...createForm, attachments: e.target.value })} placeholder={'Contoh:\n- Draft Kebijakan.pdf\n- Daftar Hadir.docx'} />
+                        <Label htmlFor="attachments">Upload Lampiran</Label>
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                          <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                          <div className="text-sm text-gray-600 mb-2">
+                            Klik untuk upload atau drag & drop file
+                          </div>
+                          <Input 
+                            id="attachments" 
+                            type="file" 
+                            multiple
+                            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
+                            onChange={(e) => {
+                              const files = Array.from(e.target.files || []);
+                              setCreateForm(prev => ({ ...prev, attachments: files }));
+                            }} 
+                            className="cursor-pointer"
+                          />
+                        </div>
+                        
+                        {/* Display uploaded files */}
+                        {createForm.attachments.length > 0 && (
+                          <div className="mt-3 space-y-2">
+                            <div className="text-sm font-medium text-gray-700">File yang diupload:</div>
+                            {createForm.attachments.map((file, index) => (
+                              <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded border">
+                                <div className="flex items-center space-x-2">
+                                  <FileText className="h-4 w-4 text-gray-500" />
+                                  <span className="text-sm text-gray-700">{file.name}</span>
+                                  <span className="text-xs text-gray-500">
+                                    ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                  </span>
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setCreateForm(prev => ({
+                                      ...prev,
+                                      attachments: prev.attachments.filter((_, i) => i !== index)
+                                    }));
+                                  }}
+                                  className="text-red-500 hover:text-red-700 text-xs p-1 h-6 w-6"
+                                >
+                                  <X className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

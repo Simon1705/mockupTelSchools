@@ -11,6 +11,7 @@ import { Analytics } from './analytics';
 import { UserManagement } from './user-management';
 import { AuditTrail } from './audit-trail';
 import { Settings } from './settings';
+import { MeetingMinutes } from './meeting-minutes';
 
 export function AdminDashboard() {
   const { user } = useAuth();
@@ -31,6 +32,8 @@ export function AdminDashboard() {
         return <ApprovalWorkflow />;
       case 'versions':
         return <VersionManagement />;
+      case 'meetings':
+        return <MeetingMinutes />;
       case 'analytics':
         return <Analytics />;
       case 'users':
