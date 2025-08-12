@@ -31,14 +31,21 @@ export function LoginForm() {
     }
   };
 
-  const handleDemoLogin = (demoEmail: string, demoPassword: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
+  const handleDemoLogin = async (demoEmail: string, demoPassword: string) => {
+    setIsLoading(true);
+    try {
+      await login(demoEmail, demoPassword);
+      toast.success('Login berhasil!');
+    } catch (error) {
+      toast.error('Login demo gagal.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50 p-4">
-      <div className="w-full max-w-md space-y-6">
+      <div className="w-full max-w-4xl space-y-6">
         <div className="text-center">
           <div className="flex justify-center mb-4">
             <Image
@@ -52,108 +59,126 @@ export function LoginForm() {
           <p className="text-gray-600 mt-2">Sistem Manajemen Kebijakan</p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Masuk ke Akun Anda</CardTitle>
-            <CardDescription>
-              Masukkan email dan password untuk mengakses sistem
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="nama@telkomschools.sch.id"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
-                  required
-                />
-              </div>
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Memproses...
-                  </>
-                ) : (
-                  'Masuk'
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Masuk ke Akun Anda</CardTitle>
+              <CardDescription>
+                Masukkan email dan password untuk mengakses sistem
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="nama@telkomschools.sch.id"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                    required
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Memproses...
+                    </>
+                  ) : (
+                    'Masuk'
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
 
-        {/* Demo Credentials */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center text-sm">
-              <Info className="h-4 w-4 mr-2" />
-              Demo Credentials
-            </CardTitle>
-            <CardDescription>
-              Gunakan credential berikut untuk testing
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Shield className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium">Admin Account</span>
-                <Badge variant="secondary">Super User</Badge>
+          {/* Demo Credentials */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center text-sm">
+                <Info className="h-4 w-4 mr-2" />
+                Demo Credentials
+              </CardTitle>
+              <CardDescription>
+                Klik untuk langsung login (tanpa menekan tombol Masuk)
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Shield className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm font-medium">Admin Account</span>
+                  <Badge variant="secondary">Super User</Badge>
+                </div>
+                <div className="text-xs text-gray-600 space-y-1">
+                  <div>Email: admin@telkomschools.sch.id</div>
+                  <div>Password: admin123</div>
+                </div>
+                <Button
+                  size="sm"
+                  // variant="outline" Dihapus
+                  className="w-full bg-blue-600 text-white hover:bg-blue-700" // Ditambahkan
+                  onClick={() => handleDemoLogin('admin@telkomschools.sch.id', 'admin123')}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Memproses...
+                    </>
+                  ) : (
+                    'Login sebagai Admin'
+                  )}
+                </Button>
               </div>
-              <div className="text-xs text-gray-600 space-y-1">
-                <div>Email: admin@telkomschools.sch.id</div>
-                <div>Password: admin123</div>
+
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <User className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-medium">User Account</span>
+                  <Badge variant="outline">Regular User</Badge>
+                </div>
+                <div className="text-xs text-gray-600 space-y-1">
+                  <div>Email: user@telkomschools.sch.id</div>
+                  <div>Password: user123</div>
+                </div>
+                <Button
+                  size="sm"
+                  // variant="outline" Dihapus
+                  className="w-full bg-green-600 text-white hover:bg-green-700" // Ditambahkan
+                  onClick={() => handleDemoLogin('user@telkomschools.sch.id', 'user123')}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Memproses...
+                    </>
+                  ) : (
+                    'Login sebagai User'
+                  )}
+                </Button>
               </div>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="w-full"
-                onClick={() => handleDemoLogin('admin@telkomschools.sch.id', 'admin123')}
-              >
-                Login sebagai Admin
-              </Button>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <User className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium">User Account</span>
-                <Badge variant="outline">Regular User</Badge>
-              </div>
-              <div className="text-xs text-gray-600 space-y-1">
-                <div>Email: user@telkomschools.sch.id</div>
-                <div>Password: user123</div>
-              </div>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="w-full"
-                onClick={() => handleDemoLogin('user@telkomschools.sch.id', 'user123')}
-              >
-                Login sebagai User
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
