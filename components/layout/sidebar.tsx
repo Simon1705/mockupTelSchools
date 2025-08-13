@@ -61,8 +61,8 @@ export function Sidebar({ className, activeMenuItem, onMenuItemChange }: Sidebar
   };
 
   return (
-    <div className={cn("pb-12 w-64 bg-white border-r border-gray-200", className)}>
-      <div className="space-y-4 py-4">
+    <div className={cn("flex flex-col h-full w-64 bg-white border-r border-gray-200", className)}>
+      <div className="flex-1 space-y-4 py-4">
         <div className="px-3 py-2">
           <div className="flex items-center mb-6">
             <div className="bg-primary rounded-lg p-2 mr-3">
@@ -108,16 +108,17 @@ export function Sidebar({ className, activeMenuItem, onMenuItemChange }: Sidebar
         </div>
       </div>
       
-      <div className="absolute bottom-4 left-3 right-3">
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-gray-600 hover:text-gray-900"
-          onClick={logout}
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          Keluar
-        </Button>
-      </div>
+      <div className="px-3 py-4 border-t border-gray-200">
+  <Button
+    variant="ghost"
+    className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+    onClick={logout}
+  >
+    <LogOut className="mr-2 h-4 w-4" />
+    Keluar
+  </Button>
+</div>
+
     </div>
   );
 }
