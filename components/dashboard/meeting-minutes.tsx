@@ -44,6 +44,7 @@ interface MeetingMinutes {
   meetingTime: string;
   meetingLocation: string;
   meetingType: 'internal' | 'external' | 'stakeholder' | 'board';
+  materiTinjauan?: string;
   participants: string[];
   agenda: string[];
   decisions: string[];
@@ -53,6 +54,9 @@ interface MeetingMinutes {
     deadline: string;
     status: 'pending' | 'completed' | 'in-progress';
   }>;
+  dasarPembahasan?: string[];
+  arahanInformasi?: string[];
+  masukanSaran?: string[];
   nextMeeting?: string;
   attachments: Array<{
     name: string;
@@ -147,10 +151,14 @@ export function MeetingMinutes() {
     meetingTime: '',
     meetingLocation: '',
     meetingType: 'internal' as 'internal' | 'external' | 'stakeholder' | 'board',
+    materiTinjauan: '',
     selectedParticipants: [] as string[],
     agenda: '',
     decisions: '',
     actionItems: '',
+    dasarPembahasan: '',
+    arahanInformasi: '',
+    masukanSaran: '',
     nextMeeting: '',
     attachments: [] as File[]
   });
@@ -174,6 +182,7 @@ export function MeetingMinutes() {
       meetingTime: '09:00',
       meetingLocation: 'Ruang Rapat Utama',
       meetingType: 'internal',
+      materiTinjauan: 'Evaluasi pembelajaran semester lalu',
       participants: [
         'Dr. Sarah Johnson - Kepala Bagian Akademik',
         'Prof. Michael Chen - Wakil Kepala Sekolah',
@@ -191,6 +200,10 @@ export function MeetingMinutes() {
         'Implementasi sistem penilaian baru akan dimulai semester depan',
         'Pelatihan guru akan dilaksanakan dalam 2 bulan ke depan',
         'Tim evaluasi akan dibentuk untuk monitoring implementasi'
+      ],
+      dasarPembahasan: [
+        'Hasil evaluasi pembelajaran semester lalu',
+        'Masukan dari tim kurikulum dan wali kelas'
       ],
       actionItems: [
         {
@@ -211,6 +224,14 @@ export function MeetingMinutes() {
           deadline: '2024-01-30',
           status: 'pending'
         }
+      ],
+      arahanInformasi: [
+        'Segera siapkan draft kebijakan revisi',
+        'Jadwalkan pelatihan guru dalam 2 bulan'
+      ],
+      masukanSaran: [
+        'Libatkan perwakilan siswa dalam evaluasi',
+        'Pertimbangkan penggunaan platform digital untuk penilaian'
       ],
       nextMeeting: '2024-02-15',
              attachments: [
@@ -241,9 +262,11 @@ export function MeetingMinutes() {
       meetingTime: '10:00',
       meetingLocation: 'Ruang Rapat',
       meetingType: 'internal',
+      materiTinjauan: 'Topik koordinasi bulanan',
       participants: ['Tim Manajemen', 'Kepala Bagian', 'Koordinator'],
       agenda: ['Review bulan lalu', 'Perencanaan bulan depan', 'Diskusi isu terkini'],
       decisions: ['Keputusan akan diisi sesuai rapat'],
+      dasarPembahasan: [],
       actionItems: [
         {
           task: 'Action item akan diisi sesuai rapat',
@@ -252,6 +275,8 @@ export function MeetingMinutes() {
           status: 'pending'
         }
       ],
+      arahanInformasi: [],
+      masukanSaran: [],
       attachments: [],
       createdBy: 'System',
       createdAt: '2024-01-01',
@@ -301,8 +326,12 @@ export function MeetingMinutes() {
   const saveCreate = () => {
     const participants = getSelectedParticipantsDisplay();
     const agenda = parseLines(createForm.agenda);
-    const decisions = parseLines(createForm.decisions);
-    const actionItems = parseLines(createForm.actionItems).map(item => ({
+    const dasarPembahasan = parseLines(createForm.dasarPembahasan);
+    const arahanInformasi = parseLines(createForm.arahanInformasi);
+    const masukanSaran = parseLines(createForm.masukanSaran);
+    // Kompatibilitas lama: simpan juga pada decisions/actionItems
+    const decisions = dasarPembahasan;
+    const actionItems = arahanInformasi.map(item => ({
       task: item,
       assignee: 'TBD',
       deadline: 'TBD',
@@ -323,10 +352,14 @@ export function MeetingMinutes() {
       meetingTime: createForm.meetingTime,
       meetingLocation: createForm.meetingLocation,
       meetingType: createForm.meetingType,
+      materiTinjauan: createForm.materiTinjauan,
       participants,
       agenda,
       decisions,
       actionItems,
+      dasarPembahasan,
+      arahanInformasi,
+      masukanSaran,
       nextMeeting: createForm.nextMeeting || undefined,
       attachments,
       createdBy: 'Admin User',
@@ -338,8 +371,8 @@ export function MeetingMinutes() {
     setIsCreating(false);
     setCreateForm({
       meetingTitle: '', meetingDate: '', meetingTime: '', meetingLocation: '',
-      meetingType: 'internal', selectedParticipants: [], agenda: '', decisions: '',
-      actionItems: '', nextMeeting: '', attachments: []
+      meetingType: 'internal', materiTinjauan: '', selectedParticipants: [], agenda: '', decisions: '',
+      actionItems: '', dasarPembahasan: '', arahanInformasi: '', masukanSaran: '', nextMeeting: '', attachments: []
     });
   };
 
@@ -593,8 +626,8 @@ export function MeetingMinutes() {
                        placeholder="Rapat Koordinasi..." 
                      />
                    </div>
-                   <div>
-                     <Label htmlFor="meetingDate">Tanggal Rapat *</Label>
+                    <div>
+                      <Label htmlFor="meetingDate">Tanggal Pelaksanaan *</Label>
                      <Input 
                        id="meetingDate" 
                        type="date" 
@@ -603,7 +636,7 @@ export function MeetingMinutes() {
                      />
                    </div>
                    <div>
-                     <Label htmlFor="meetingTime">Waktu Rapat *</Label>
+                      <Label htmlFor="meetingTime">Waktu *</Label>
                      <Input 
                        id="meetingTime" 
                        type="time" 
@@ -612,7 +645,7 @@ export function MeetingMinutes() {
                      />
                    </div>
                    <div>
-                     <Label htmlFor="meetingLocation">Lokasi Rapat *</Label>
+                      <Label htmlFor="meetingLocation">Tempat *</Label>
                      <Input 
                        id="meetingLocation" 
                        value={createForm.meetingLocation} 
@@ -620,6 +653,15 @@ export function MeetingMinutes() {
                        placeholder="Ruang Rapat..." 
                      />
                    </div>
+                    <div>
+                      <Label htmlFor="materiTinjauan">Materi Tinjauan *</Label>
+                      <Input 
+                        id="materiTinjauan" 
+                        value={createForm.materiTinjauan} 
+                        onChange={(e) => setCreateForm({ ...createForm, materiTinjauan: e.target.value })} 
+                        placeholder="Materi yang ditinjau..." 
+                      />
+                    </div>
                    <div>
                      <Label>Tipe Rapat</Label>
                      <Select value={createForm.meetingType} onValueChange={(v) => setCreateForm({ ...createForm, meetingType: v as any })}>
@@ -850,7 +892,7 @@ export function MeetingMinutes() {
                  </div>
                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                 <div>
                   <Label htmlFor="agenda">Agenda Rapat (satu per baris)</Label>
                   <Textarea 
@@ -862,23 +904,33 @@ export function MeetingMinutes() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="decisions">Keputusan (satu per baris)</Label>
+                  <Label htmlFor="dasarPembahasan">Dasar Pembahasan (satu per baris)</Label>
                   <Textarea 
-                    id="decisions" 
+                    id="dasarPembahasan" 
                     rows={6} 
-                    value={createForm.decisions} 
-                    onChange={(e) => setCreateForm({ ...createForm, decisions: e.target.value })} 
-                    placeholder={`1. Keputusan pertama\n2. Keputusan kedua...`} 
+                    value={createForm.dasarPembahasan} 
+                    onChange={(e) => setCreateForm({ ...createForm, dasarPembahasan: e.target.value })} 
+                    placeholder={`1. Dasar pertama\n2. Dasar kedua...`} 
                   />
                 </div>
                 <div>
-                  <Label htmlFor="actionItems">Action Items (satu per baris)</Label>
+                  <Label htmlFor="arahanInformasi">Arahan/Informasi (satu per baris)</Label>
                   <Textarea 
-                    id="actionItems" 
+                    id="arahanInformasi" 
                     rows={6} 
-                    value={createForm.actionItems} 
-                    onChange={(e) => setCreateForm({ ...createForm, actionItems: e.target.value })} 
-                    placeholder={`1. Tugas pertama\n2. Tugas kedua...`} 
+                    value={createForm.arahanInformasi} 
+                    onChange={(e) => setCreateForm({ ...createForm, arahanInformasi: e.target.value })} 
+                    placeholder={`1. Arahan pertama\n2. Informasi kedua...`} 
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="masukanSaran">Masukan dan Saran (satu per baris)</Label>
+                  <Textarea 
+                    id="masukanSaran" 
+                    rows={6} 
+                    value={createForm.masukanSaran} 
+                    onChange={(e) => setCreateForm({ ...createForm, masukanSaran: e.target.value })} 
+                    placeholder={`1. Masukan pertama\n2. Saran kedua...`} 
                   />
                 </div>
               </div>
@@ -1023,6 +1075,19 @@ export function MeetingMinutes() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
+                    {/* Header Table to match photo */}
+                    <div className="mb-4 border rounded">
+                      <div className="grid grid-cols-2 divide-x divide-gray-200">
+                        <div className="p-2 border-b font-medium">Tanggal Pelaksanaan</div>
+                        <div className="p-2 border-b">{new Date(selectedMinutes.meetingDate).toLocaleDateString('id-ID')}</div>
+                        <div className="p-2 border-b font-medium">Materi Tinjauan</div>
+                        <div className="p-2 border-b">{selectedMinutes.materiTinjauan || '-'}</div>
+                        <div className="p-2 border-b font-medium">Tempat</div>
+                        <div className="p-2 border-b">{selectedMinutes.meetingLocation}</div>
+                        <div className="p-2 font-medium">Waktu</div>
+                        <div className="p-2">{selectedMinutes.meetingTime}</div>
+                      </div>
+                    </div>
                     <div className="space-y-2">
                       {selectedMinutes.participants.map((participant, index) => (
                         <div key={index} className="text-sm text-gray-700 p-2 bg-gray-50 rounded">
@@ -1056,12 +1121,12 @@ export function MeetingMinutes() {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <CheckCircle className="h-5 w-5 mr-2" />
-                      Keputusan
+                      II. Dasar Pembahasan
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      {selectedMinutes.decisions.map((decision, index) => (
+                      {(selectedMinutes.dasarPembahasan || selectedMinutes.decisions).map((decision, index) => (
                         <div key={index} className="text-sm text-gray-700 p-2 bg-green-50 rounded border-l-4 border-green-200">
                           {index + 1}. {decision}
                         </div>
@@ -1073,27 +1138,50 @@ export function MeetingMinutes() {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <CheckCircle className="h-5 w-5 mr-2" />
-                      Action Items
+                      III. Arahan/Informasi
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      {selectedMinutes.actionItems.map((item, index) => (
-                        <div key={index} className="text-sm text-gray-700 p-3 bg-blue-50 rounded border-l-4 border-blue-200">
-                          <div className="font-medium">{item.task}</div>
-                          <div className="text-xs text-gray-600 mt-1">
-                            Assignee: {item.assignee} | Deadline: {item.deadline}
+                      {(selectedMinutes.arahanInformasi && selectedMinutes.arahanInformasi.length > 0
+                        ? selectedMinutes.arahanInformasi.map((text, index) => ({ task: text, assignee: 'TBD', deadline: 'TBD', status: 'pending' as const }))
+                        : selectedMinutes.actionItems).map((item, index) => (
+                          <div key={index} className="text-sm text-gray-700 p-3 bg-blue-50 rounded border-l-4 border-blue-200">
+                            <div className="font-medium">{item.task}</div>
+                            <div className="text-xs text-gray-600 mt-1">
+                              Assignee: {item.assignee} | Deadline: {item.deadline}
+                            </div>
+                            <Badge variant={getStatusColor(item.status)} className="mt-2">
+                              {item.status === 'completed' ? 'Selesai' :
+                               item.status === 'in-progress' ? 'Proses' : 'Pending'}
+                            </Badge>
                           </div>
-                          <Badge variant={getStatusColor(item.status)} className="mt-2">
-                            {item.status === 'completed' ? 'Selesai' :
-                             item.status === 'in-progress' ? 'Proses' : 'Pending'}
-                          </Badge>
+                        ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* IV. Masukan dan Saran */}
+              {selectedMinutes.masukanSaran && selectedMinutes.masukanSaran.length > 0 && (
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <FileText className="h-5 w-5 mr-2" />
+                      IV. Masukan dan Saran
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {selectedMinutes.masukanSaran.map((item, index) => (
+                        <div key={index} className="text-sm text-gray-700 p-2 bg-gray-50 rounded">
+                          {index + 1}. {item}
                         </div>
                       ))}
                     </div>
                   </CardContent>
                 </Card>
-              </div>
+              )}
 
               {selectedMinutes.nextMeeting && (
                 <Card className="mb-6">
