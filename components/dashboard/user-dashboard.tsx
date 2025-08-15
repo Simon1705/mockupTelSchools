@@ -682,40 +682,78 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
 
   const renderDashboard = () => (
     <>
-      {/* Hero Section - Mirip BPK */}
-      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 rounded-xl p-8 text-white shadow-lg mb-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">SELAMAT DATANG DI DATABASE KEBIJAKAN TELKOM SCHOOLS</h1>
-          <p className="text-xl text-blue-100 mb-6">Akses dan pelajari kebijakan sekolah dengan mudah dan cepat</p>
-          
-          {/* Search Bar Prominent - Mirip BPK */}
-          <div className="max-w-3xl mx-auto">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Cari kebijakan, peraturan, atau dokumen..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-14 text-lg border-0 focus:ring-2 focus:ring-white focus:ring-opacity-50 text-gray-900 placeholder-gray-400"
+      {/* Hero Section - Telkom Schools Theme */}
+      <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-4 text-white shadow-lg mb-4 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 to-transparent"></div>
+        </div>
+        
+        <div className="relative z-10">
+          <div className="flex flex-col items-center text-center">
+            {/* Logo Telkom Schools */}
+            <div className="mb-3">
+              <img 
+                src="/logo-telkom-schools.png" 
+                alt="Telkom Schools Logo" 
+                className="h-12 w-auto filter brightness-0 invert"
               />
-              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-2">
-                <Button className="bg-blue-500 hover:bg-blue-600 h-10 px-6">
-                  <Search className="h-4 w-4 mr-2" />
-                  Cari
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-10 px-6 bg-black border-black text-white hover:bg-gray-800"
-                  onClick={handleAdvancedFilter}
-                >
-                  Filter Lanjutan
-                </Button>
-              </div>
             </div>
+            
+            {/* Professional Title */}
+            <div className="mb-3">
+              <h1 className="text-xl md:text-2xl font-bold mb-1 leading-tight">
+                SISTEM INFORMASI KEBIJAKAN
+              </h1>
+              <h2 className="text-lg md:text-xl font-semibold text-red-100 mb-1">
+                TELKOM SCHOOLS
+              </h2>
+              <div className="w-16 h-0.5 bg-white mx-auto rounded-full"></div>
+            </div>
+            
+            <p className="text-sm md:text-base text-red-100 mb-0 max-w-2xl">
+              Platform terpadu untuk mengakses, mengelola, dan mempelajari kebijakan institusi pendidikan Telkom Schools
+            </p>
           </div>
         </div>
       </div>
+
+      {/* Search & Advanced Filter Panel */}
+      <Card className="shadow-lg border-0 bg-gradient-to-r from-gray-50 to-white mb-8">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Search className="h-5 w-5 text-red-600" />
+              <CardTitle className="text-xl">Pencarian Kebijakan</CardTitle>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="relative max-w-3xl mx-auto">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Cari kebijakan, peraturan, atau dokumen..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 h-12 text-base border-2 focus:border-red-500 focus:ring-red-500 text-gray-900 placeholder-gray-400"
+            />
+            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-2">
+              <Button onClick={() => setActiveMenuItem('policies')} className="bg-red-600 hover:bg-red-700 h-10 px-6">
+                <Search className="h-4 w-4 mr-2" />
+                Cari
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-10 px-6 bg-black border-black text-white hover:bg-gray-800"
+                onClick={handleAdvancedFilter}
+              >
+                Filter Lanjutan
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Popular Policies Section - Mirip BPK */}
       <div className="mb-8">
@@ -958,12 +996,12 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
 
   const renderPolicies = () => (
     <>
-      {/* Hero Section - Mirip BPK */}
-      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 rounded-xl p-8 text-white shadow-lg mb-8">
-        <div className="text-center">
+      {/* Hero Section - Telkom Red */}
+      <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-8 text-white shadow-lg mb-8">
+        <div className="">
           <h1 className="text-4xl font-bold mb-4">📋 DAFTAR KEBIJAKAN</h1>
-          <p className="text-xl text-blue-100 mb-6">Temukan dan akses semua kebijakan Telkom Schools</p>
-          <div className="flex items-center justify-center space-x-4 text-sm">
+          <p className="text-xl text-red-100 mb-6">Temukan dan akses semua kebijakan Telkom Schools</p>
+          <div className="flex items-center space-x-4 text-sm">
             <div className="flex items-center space-x-2">
               <FileText className="h-4 w-4" />
               <span>{filteredPolicies.length} kebijakan tersedia</span>
@@ -1177,12 +1215,12 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
 
   const renderContact = () => (
     <>
-      {/* Hero Section - Mirip BPK */}
-      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 rounded-xl p-8 text-white shadow-lg mb-8">
-        <div className="text-center">
+      {/* Hero Section - Telkom Red */}
+      <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-8 text-white shadow-lg mb-8">
+        <div className="">
           <h1 className="text-4xl font-bold mb-4">📞 KONTAK ADMIN KEBIJAKAN</h1>
-          <p className="text-xl text-blue-100 mb-6">Hubungi tim pengelola kebijakan untuk bantuan dan dukungan teknis</p>
-          <div className="flex items-center justify-center space-x-6 text-sm">
+          <p className="text-xl text-red-100 mb-6">Hubungi tim pengelola kebijakan untuk bantuan dan dukungan teknis</p>
+          <div className="flex items-center space-x-6 text-sm">
             <div className="flex items-center space-x-2">
               <Phone className="h-4 w-4" />
               <span>Dukungan 24/7</span>
@@ -1270,12 +1308,12 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
 
   const renderVersions = () => (
     <>
-      {/* Hero Section - Mirip BPK */}
-      <div className="bg-gradient-to-r from-green-600 via-green-700 to-green-800 rounded-xl p-8 text-white shadow-lg mb-8">
-        <div className="text-center">
+      {/* Hero Section - Telkom Red */}
+      <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-8 text-white shadow-lg mb-8">
+        <div className="">
           <h1 className="text-4xl font-bold mb-4">🔄 VERSI KEBIJAKAN</h1>
-          <p className="text-xl text-green-100 mb-6">Lihat dan bandingkan berbagai versi kebijakan Telkom Schools</p>
-          <div className="flex items-center justify-center space-x-6 text-sm">
+          <p className="text-xl text-red-100 mb-6">Lihat dan bandingkan berbagai versi kebijakan Telkom Schools</p>
+          <div className="flex items-center space-x-6 text-sm">
             <div className="flex items-center space-x-2">
               <FileText className="h-4 w-4" />
               <span>Total Versi: 24</span>
@@ -1482,11 +1520,11 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
   const renderProfile = () => (
     <>
       {/* Hero Section - Mirip BPK */}
-      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 rounded-xl p-8 text-white shadow-lg mb-8">
-        <div className="text-center">
+      <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-8 text-white shadow-lg mb-8">
+        <div className="">
           <h1 className="text-4xl font-bold mb-4">👤 PROFIL SAYA</h1>
           <p className="text-xl text-blue-100 mb-6">Kelola informasi profil dan pengaturan akun Anda</p>
-          <div className="flex items-center justify-center space-x-6 text-sm">
+          <div className="flex items-center space-x-6 text-sm">
             <div className="flex items-center space-x-2">
               <CheckCircle className="h-4 w-4" />
               <span>Status: Aktif</span>

@@ -238,15 +238,43 @@ Evaluasi penggunaan dan feedback pengguna.`,
 
   return (
     <>
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Manajemen Kebijakan</h1>
-          <p className="text-gray-600">Kelola semua kebijakan perusahaan</p>
+      {/* Hero Section - Policy Management */}
+      <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-6 text-white shadow-lg mb-6 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 to-transparent"></div>
         </div>
-        <Button onClick={handleAddPolicy}>
-          <Plus className="h-4 w-4 mr-2" />
-          Tambah Kebijakan
-        </Button>
+        
+        <div className="relative z-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="bg-white/20 rounded-lg p-3">
+                <FileText className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold mb-1">Manajemen Kebijakan</h1>
+                <p className="text-red-100 text-sm md:text-base">Kelola dan administrasi kebijakan institusi Telkom Schools</p>
+                <div className="flex items-center space-x-4 mt-2 text-xs">
+                  <span className="flex items-center">
+                    <FileText className="h-3 w-3 mr-1" />
+                    {filteredPolicies.length} kebijakan aktif
+                  </span>
+                  <span className="flex items-center">
+                    <AlertTriangle className="h-3 w-3 mr-1" />
+                    {filteredPolicies.filter(p => p.status === 'draft').length} draft
+                  </span>
+                </div>
+              </div>
+            </div>
+            <Button 
+              onClick={handleAddPolicy}
+              className="bg-white text-red-600 hover:bg-gray-100 font-semibold"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Tambah Kebijakan
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Filters */}

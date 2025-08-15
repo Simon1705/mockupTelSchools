@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search } from 'lucide-react';
+import { Search, Activity, Clock, User, Shield } from 'lucide-react';
 
 export function AuditTrail() {
   const auditLogs = [
@@ -47,9 +47,46 @@ export function AuditTrail() {
 
   return (
     <>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Audit Trail</h1>
-        <p className="text-gray-600">Log aktivitas semua pengguna sistem</p>
+      {/* Hero Section - Audit Trail */}
+      <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-6 text-white shadow-lg mb-6 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 to-transparent"></div>
+        </div>
+        
+        <div className="relative z-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="bg-white/20 rounded-lg p-3">
+                <Activity className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold mb-1">Audit Trail</h1>
+                <p className="text-red-100 text-sm md:text-base">Log aktivitas dan riwayat akses semua pengguna sistem</p>
+                <div className="flex items-center space-x-4 mt-2 text-xs">
+                  <span className="flex items-center">
+                    <Activity className="h-3 w-3 mr-1" />
+                    {auditLogs.length} aktivitas hari ini
+                  </span>
+                  <span className="flex items-center">
+                    <User className="h-3 w-3 mr-1" />
+                    {new Set(auditLogs.map(log => log.user)).size} pengguna aktif
+                  </span>
+                  <span className="flex items-center">
+                    <Shield className="h-3 w-3 mr-1" />
+                    Sistem monitoring aktif
+                  </span>
+                </div>
+              </div>
+            </div>
+            <Button 
+              className="bg-white text-red-600 hover:bg-gray-100 font-semibold"
+            >
+              <Search className="h-4 w-4 mr-2" />
+              Export Log
+            </Button>
+          </div>
+        </div>
       </div>
 
       <Card className="mb-6">

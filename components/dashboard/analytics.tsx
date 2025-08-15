@@ -15,9 +15,46 @@ export function Analytics() {
 
   return (
     <>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Pelaporan & Analitik</h1>
-        <p className="text-gray-600">Analisis komprehensif tingkat pembacaan, kepatuhan, dan performa kebijakan</p>
+      {/* Hero Section - Analytics */}
+      <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-6 text-white shadow-lg mb-6 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 to-transparent"></div>
+        </div>
+        
+        <div className="relative z-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="bg-white/20 rounded-lg p-3">
+                <BarChart3 className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold mb-1">Pelaporan & Analitik</h1>
+                <p className="text-red-100 text-sm md:text-base">Analisis komprehensif tingkat pembacaan, kepatuhan, dan performa kebijakan</p>
+                <div className="flex items-center space-x-4 mt-2 text-xs">
+                  <span className="flex items-center">
+                    <BarChart3 className="h-3 w-3 mr-1" />
+                    1,247 total views
+                  </span>
+                  <span className="flex items-center">
+                    <Download className="h-3 w-3 mr-1" />
+                    892 downloads
+                  </span>
+                  <span className="flex items-center">
+                    <TrendingUp className="h-3 w-3 mr-1" />
+                    +12% pertumbuhan
+                  </span>
+                </div>
+              </div>
+            </div>
+            <Button 
+              className="bg-white text-red-600 hover:bg-gray-100 font-semibold"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export Laporan
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Summary Cards */}

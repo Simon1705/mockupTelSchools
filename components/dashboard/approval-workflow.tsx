@@ -390,33 +390,58 @@ Evaluasi berkala setiap semester untuk memastikan efektivitas implementasi.`,
 
   return (
     <>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Approval Workflow</h1>
-        <p className="text-gray-600">Kelola proses persetujuan kebijakan</p>
+      {/* Hero Section - Approval Workflow */}
+      <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-6 text-white shadow-lg mb-6 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 to-transparent"></div>
+        </div>
         
-        {/* Role Information */}
-        <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+        <div className="relative z-10">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              {user?.role === 'admin' && <Crown className="h-4 w-4 text-yellow-600" />}
-              <span className="text-sm font-medium text-gray-700">
-                Role Anda: <span className="font-semibold">
-                  {user?.role === 'admin' ? 'Administrator' :
-                   user?.role === 'approver' ? 'Approver' :
-                   user?.role === 'editor' ? 'Editor' : 'Viewer'}
-                </span>
-              </span>
+            <div className="flex items-center space-x-4">
+              <div className="bg-white/20 rounded-lg p-3">
+                <CheckCircle2 className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold mb-1">Approval Workflow</h1>
+                <p className="text-red-100 text-sm md:text-base">Kelola proses persetujuan dan validasi kebijakan</p>
+                <div className="flex items-center space-x-4 mt-2 text-xs">
+                  <span className="flex items-center">
+                    <Clock className="h-3 w-3 mr-1" />
+                    {workflows.filter(w => w.status === 'pending').length} pending
+                  </span>
+                  <span className="flex items-center">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    {workflows.filter(w => w.status === 'approved').length} approved
+                  </span>
+                  <span className="flex items-center">
+                    <XCircle className="h-3 w-3 mr-1" />
+                    {workflows.filter(w => w.status === 'rejected').length} rejected
+                  </span>
+                </div>
+              </div>
             </div>
-            <Button size="sm" onClick={openCreateModal}>
-              <Plus className="h-4 w-4 mr-2" />
-              Buat Pengajuan
-            </Button>
+            <div className="flex items-center space-x-3">
+              <div className="bg-white/20 rounded-lg p-3">
+                <div className="flex items-center space-x-2">
+                  {user?.role === 'admin' && <Crown className="h-4 w-4 text-yellow-300" />}
+                  <span className="text-sm font-medium">
+                    {user?.role === 'admin' ? 'Administrator' :
+                     user?.role === 'approver' ? 'Approver' :
+                     user?.role === 'editor' ? 'Editor' : 'Viewer'}
+                  </span>
+                </div>
+              </div>
+              <Button 
+                onClick={openCreateModal}
+                className="bg-white text-red-600 hover:bg-gray-100 font-semibold"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Buat Pengajuan
+              </Button>
+            </div>
           </div>
-          <p className="text-xs text-gray-600 mt-1">
-            {user?.role === 'admin' ? 'Anda dapat approve/reject di semua level' :
-             user?.role === 'approver' ? 'Anda dapat approve/reject di level yang sesuai' :
-             'Anda hanya dapat melihat status approval'}
-          </p>
         </div>
       </div>
 

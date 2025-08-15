@@ -191,10 +191,42 @@ export function DashboardOverview({ onMenuItemChange }: DashboardOverviewProps) 
 
   return (
     <div className="space-y-6">
-      {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-6 text-white">
-        <h1 className="text-2xl font-bold mb-2">Selamat Datang di Sistem Manajemen Kebijakan</h1>
-        <p className="text-blue-100">Kelola dan pantau kebijakan sekolah dengan mudah dan efisien</p>
+      {/* Hero Section - Admin Dashboard */}
+      <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 to-transparent"></div>
+        </div>
+        
+        <div className="relative z-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="bg-white/20 rounded-lg p-3">
+                <BarChart3 className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold mb-1">Sistem Manajemen Kebijakan</h1>
+                <p className="text-red-100 text-sm md:text-base">Kelola dan pantau kebijakan Telkom Schools dengan mudah dan efisien</p>
+                <div className="flex items-center space-x-4 mt-2 text-xs">
+                  <span className="flex items-center">
+                    <FileText className="h-3 w-3 mr-1" />
+                    1,247 total kebijakan
+                  </span>
+                  <span className="flex items-center">
+                    <CheckSquare className="h-3 w-3 mr-1" />
+                    23 menunggu approval
+                  </span>
+                  <span className="flex items-center">
+                    <Users className="h-3 w-3 mr-1" />
+                    892 pengguna aktif
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Statistics Cards */}

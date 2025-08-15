@@ -30,7 +30,8 @@ import {
   MapPin,
   Send,
   Lock,
-  Unlock
+  Unlock,
+  Users
 } from 'lucide-react';
 
 interface SystemUser {
@@ -285,15 +286,47 @@ export function UserManagement() {
 
   return (
     <>
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Manajemen Pengguna</h1>
-          <p className="text-gray-600">Kelola pengguna dan hak akses sistem</p>
+      {/* Hero Section - User Management */}
+      <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-6 text-white shadow-lg mb-6 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 to-transparent"></div>
         </div>
-        <Button onClick={() => setIsAddingUser(true)}>
-          <UserPlus className="h-4 w-4 mr-2" />
-          Tambah Pengguna
-        </Button>
+        
+        <div className="relative z-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="bg-white/20 rounded-lg p-3">
+                <Users className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold mb-1">Manajemen Pengguna</h1>
+                <p className="text-red-100 text-sm md:text-base">Kelola pengguna dan hak akses sistem Telkom Schools</p>
+                <div className="flex items-center space-x-4 mt-2 text-xs">
+                  <span className="flex items-center">
+                    <User className="h-3 w-3 mr-1" />
+                    {systemUsers.length} total pengguna
+                  </span>
+                  <span className="flex items-center">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    {systemUsers.filter(u => u.status === 'active').length} aktif
+                  </span>
+                  <span className="flex items-center">
+                    <Shield className="h-3 w-3 mr-1" />
+                    {systemUsers.filter(u => u.role === 'admin').length} admin
+                  </span>
+                </div>
+              </div>
+            </div>
+            <Button 
+              onClick={() => setIsAddingUser(true)}
+              className="bg-white text-red-600 hover:bg-gray-100 font-semibold"
+            >
+              <UserPlus className="h-4 w-4 mr-2" />
+              Tambah Pengguna
+            </Button>
+          </div>
+        </div>
       </div>
 
       <Card>

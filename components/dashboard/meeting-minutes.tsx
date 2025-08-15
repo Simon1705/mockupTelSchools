@@ -444,9 +444,57 @@ export function MeetingMinutes() {
 
   return (
     <>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Notulen Rapat</h1>
-        <p className="text-gray-600">Kelola hasil rapat dan template notulen</p>
+      {/* Hero Section - Meeting Minutes */}
+      <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-6 text-white shadow-lg mb-6 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 to-transparent"></div>
+        </div>
+        
+        <div className="relative z-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="bg-white/20 rounded-lg p-3">
+                <FileText className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold mb-1">Notulen Rapat</h1>
+                <p className="text-red-100 text-sm md:text-base">Kelola hasil rapat dan template notulen institusi</p>
+                <div className="flex items-center space-x-4 mt-2 text-xs">
+                  <span className="flex items-center">
+                    <FileText className="h-3 w-3 mr-1" />
+                    {filteredMinutes.length} notulen
+                  </span>
+                  <span className="flex items-center">
+                    <Users className="h-3 w-3 mr-1" />
+                    {filteredMinutes.reduce((acc, m) => acc + m.participants.length, 0)} peserta
+                  </span>
+                  <span className="flex items-center">
+                    <Calendar className="h-3 w-3 mr-1" />
+                    {filteredMinutes.filter(m => new Date(m.meetingDate) >= new Date(Date.now() - 30*24*60*60*1000)).length} bulan ini
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button 
+                onClick={openCreateModal}
+                className="bg-white text-red-600 hover:bg-gray-100 font-semibold"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Buat Notulen
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={openUploadModal}
+                className="border-white text-white hover:bg-white/20"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Upload PDF
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Search and Filter */}

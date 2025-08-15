@@ -10,7 +10,6 @@ import {
   Users,
   BarChart3,
   LogOut,
-  School,
   Bell,
   Archive,
   Phone,
@@ -64,19 +63,16 @@ export function Sidebar({ className, activeMenuItem, onMenuItemChange }: Sidebar
     <div className={cn("flex flex-col h-full w-64 bg-white border-r border-gray-200", className)}>
       <div className="flex-1 space-y-4 py-4">
         <div className="px-3 py-2">
-          <div className="flex items-center mb-6">
-            <div className="bg-primary rounded-lg p-2 mr-3">
-              <School className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">Telkom Schools</h2>
-              <p className="text-xs text-gray-500">Policy Management</p>
+          <div className="flex flex-col items-center mb-6">
+            <img src="/logo-telkom-schools.png" alt="Telkom Schools" className="h-12 w-auto mb-3" />
+            <div className="text-center">
+              <h1 className="text-xs text-gray-500">Policy Management</h1>
             </div>
           </div>
           
-          <div className="bg-blue-50 rounded-lg p-3 mb-6">
+          <div className="bg-red-50 rounded-lg p-3 mb-6">
             <div className="flex items-center">
-              <div className="bg-primary rounded-full p-1 mr-2">
+              <div className="bg-red-600 rounded-full p-1 mr-2">
                 <User className="h-4 w-4 text-white" />
               </div>
               <div className="min-w-0 flex-1">
