@@ -34,7 +34,7 @@ export function Sidebar({ className, activeMenuItem, onMenuItemChange }: Sidebar
   const userMenuItems = [
     { id: 'dashboard', label: 'Beranda', icon: Home },
     { id: 'policies', label: 'Daftar Kebijakan', icon: FileText },
-    { id: 'revoked', label: 'Kebijakan Dicabut', icon: Archive },
+    { id: 'versions', label: 'Versi Kebijakan', icon: GitBranch },
     { id: 'contact', label: 'Kontak Admin', icon: Phone },
     { id: 'profile', label: 'Profil Saya', icon: User },
   ];

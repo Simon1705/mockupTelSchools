@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Sidebar } from '@/components/layout/sidebar';
 import { useAuth } from '@/components/providers';
 import {
@@ -29,10 +31,14 @@ import {
   User,
   Edit,
   Save,
-  X
+  X,
+  AlertCircle,
+  GitBranch,
+  Shield
 } from 'lucide-react';
 
 export function UserDashboard() {
+  const router = useRouter();
   const { user } = useAuth();
   const [activeMenuItem, setActiveMenuItem] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -44,8 +50,23 @@ export function UserDashboard() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedYear, setSelectedYear] = useState('all');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [selectedPolicy, setSelectedPolicy] = useState<any>(null);
-  const [showPolicyDetail, setShowPolicyDetail] = useState(false);
+  
+  // State untuk versi kebijakan
+  const [versionSearchQuery, setVersionSearchQuery] = useState('');
+  const [versionSelectedCategory, setVersionSelectedCategory] = useState('all');
+  const [versionSelectedYear, setVersionSelectedYear] = useState('all');
+
+  // State untuk filter lanjutan
+  const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState({
+    category: 'all',
+    year: 'all',
+    status: 'all',
+    department: 'all',
+    dateRange: 'all',
+    sortBy: 'relevance'
+  });
+
   const [profileData, setProfileData] = useState({
     name: user?.name || 'John Doe',
     email: user?.email || 'john.doe@telkomschools.sch.id',
@@ -485,30 +506,97 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
     }
   ];
 
-  const revokedPolicies = [
+  // Data untuk versi kebijakan
+  const policyVersions = [
     {
       id: '1',
-      title: 'Kebijakan Pembelajaran Tatap Muka 2023',
+      title: 'Kebijakan Pembelajaran Hybrid 2024',
+      description: 'Kebijakan ini mengatur pembelajaran hybrid yang menggabungkan tatap muka dan online untuk memastikan kelangsungan pendidikan.',
       category: 'Akademik',
-      revokedDate: '2024-01-15',
-      policyNumber: 'TEL/AKD/025/2023',
-      reason: 'Digantikan dengan kebijakan pembelajaran hybrid yang lebih komprehensif'
+      versionNumber: '2.1',
+      status: 'active',
+      policyNumber: 'TEL/AKD/001/2024',
+      createdDate: '2024-01-15',
+      lastUpdated: '2024-01-15',
+      createdBy: 'Tim Akademik',
+      totalViews: 156,
+      totalDownloads: 89,
+      confirmations: 95
     },
     {
       id: '2',
-      title: 'Protokol COVID-19 Versi 2.0',
-      category: 'Keselamatan',
-      revokedDate: '2023-12-31',
-      policyNumber: 'TEL/K3/018/2022',
-      reason: 'Tidak relevan dengan kondisi terkini, digantikan dengan protokol kesehatan umum'
+      title: 'Kebijakan Pembelajaran Hybrid 2023',
+      description: 'Versi sebelumnya dari kebijakan pembelajaran hybrid yang telah diperbarui.',
+      category: 'Akademik',
+      versionNumber: '2.0',
+      status: 'inactive',
+      policyNumber: 'TEL/AKD/001/2023',
+      createdDate: '2023-06-15',
+      lastUpdated: '2023-12-20',
+      createdBy: 'Tim Akademik',
+      totalViews: 89,
+      totalDownloads: 45,
+      confirmations: 78
     },
     {
       id: '3',
-      title: 'Panduan Sistem Lama SIA v1.0',
+      title: 'Protokol Kesehatan dan Keselamatan Kerja',
+      description: 'Protokol ini mengatur standar kesehatan dan keselamatan kerja di lingkungan sekolah.',
+      category: 'Keselamatan',
+      versionNumber: '1.5',
+      status: 'active',
+      policyNumber: 'TEL/K3/002/2024',
+      createdDate: '2024-01-10',
+      lastUpdated: '2024-01-10',
+      createdBy: 'Tim K3',
+      totalViews: 203,
+      totalDownloads: 145,
+      confirmations: 98
+    },
+    {
+      id: '4',
+      title: 'Protokol Kesehatan dan Keselamatan Kerja',
+      description: 'Versi sebelumnya dari protokol K3 yang telah diperbarui.',
+      category: 'Keselamatan',
+      versionNumber: '1.4',
+      status: 'inactive',
+      policyNumber: 'TEL/K3/002/2023',
+      createdDate: '2023-08-10',
+      lastUpdated: '2023-12-15',
+      createdBy: 'Tim K3',
+      totalViews: 134,
+      totalDownloads: 89,
+      confirmations: 76
+    },
+    {
+      id: '5',
+      title: 'Panduan Penggunaan Sistem Informasi Akademik',
+      description: 'Panduan lengkap penggunaan SIA untuk staff dan siswa.',
       category: 'Teknologi',
-      revokedDate: '2023-12-01',
-      policyNumber: 'TEL/TI/008/2022',
-      reason: 'Sistem telah diupgrade ke versi terbaru'
+      versionNumber: '3.0',
+      status: 'active',
+      policyNumber: 'TEL/TI/003/2024',
+      createdDate: '2024-01-05',
+      lastUpdated: '2024-01-05',
+      createdBy: 'Tim IT',
+      totalViews: 89,
+      totalDownloads: 67,
+      confirmations: 87
+    },
+    {
+      id: '6',
+      title: 'Panduan Penggunaan Sistem Informasi Akademik',
+      description: 'Versi sebelumnya dari panduan SIA yang telah diperbarui.',
+      category: 'Teknologi',
+      versionNumber: '2.5',
+      status: 'inactive',
+      policyNumber: 'TEL/TI/003/2023',
+      createdDate: '2023-09-05',
+      lastUpdated: '2023-12-20',
+      createdBy: 'Tim IT',
+      totalViews: 67,
+      totalDownloads: 45,
+      confirmations: 72
     }
   ];
 
@@ -544,94 +632,204 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
     return matchesSearch && matchesCategory && matchesYear;
   });
 
+  const filteredPolicyVersions = policyVersions.filter(version => {
+    const matchesSearch = version.title.toLowerCase().includes(versionSearchQuery.toLowerCase()) ||
+                         version.policyNumber.toLowerCase().includes(versionSearchQuery.toLowerCase());
+    const matchesCategory = versionSelectedCategory === 'all' || version.category === versionSelectedCategory;
+    const matchesYear = versionSelectedYear === 'all' || new Date(version.createdDate).getFullYear().toString() === versionSelectedYear;
+    return matchesSearch && matchesCategory && matchesYear;
+  });
+
   const handleProfileSave = () => {
     setIsEditingProfile(false);
     // Here you would typically save to backend
   };
 
   const handleViewPolicy = (policy: any) => {
-    // Jika policy dari beranda (recentPolicies), cari data lengkap dari allPolicies
-    if (!policy.content) {
-      const fullPolicy = allPolicies.find(p => p.id === policy.id);
-      if (fullPolicy) {
-        setSelectedPolicy(fullPolicy);
-      } else {
-        setSelectedPolicy(policy);
-      }
-    } else {
-      setSelectedPolicy(policy);
-    }
-    setShowPolicyDetail(true);
+    // Navigate ke halaman policy detail menggunakan router
+    router.push(`/policy/${policy.id}`);
   };
 
-  const handleClosePolicyDetail = () => {
-    setShowPolicyDetail(false);
-    setSelectedPolicy(null);
+  const handleViewVersion = (version: any) => {
+    // Navigate ke halaman version comparison menggunakan router
+    router.push(`/version/${version.id}`);
   };
+
+  // Fungsi untuk filter lanjutan
+  const handleAdvancedFilter = () => {
+    setShowAdvancedFilter(true);
+  };
+
+  const handleApplyFilters = () => {
+    // Apply filters logic here
+    console.log('Applying filters:', advancedFilters);
+    setShowAdvancedFilter(false);
+    // You can add logic to filter the policies based on advancedFilters
+  };
+
+  const handleResetFilters = () => {
+    setAdvancedFilters({
+      category: 'all',
+      year: 'all',
+      status: 'all',
+      department: 'all',
+      dateRange: 'all',
+      sortBy: 'relevance'
+    });
+  };
+
+
 
   const renderDashboard = () => (
     <>
+      {/* Hero Section - Mirip BPK */}
+      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 rounded-xl p-8 text-white shadow-lg mb-8">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">SELAMAT DATANG DI DATABASE KEBIJAKAN TELKOM SCHOOLS</h1>
+          <p className="text-xl text-blue-100 mb-6">Akses dan pelajari kebijakan sekolah dengan mudah dan cepat</p>
+          
+          {/* Search Bar Prominent - Mirip BPK */}
+          <div className="max-w-3xl mx-auto">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Cari kebijakan, peraturan, atau dokumen..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 h-14 text-lg border-0 focus:ring-2 focus:ring-white focus:ring-opacity-50 text-gray-900 placeholder-gray-400"
+              />
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-2">
+                <Button className="bg-blue-500 hover:bg-blue-600 h-10 px-6">
+                  <Search className="h-4 w-4 mr-2" />
+                  Cari
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-10 px-6 bg-black border-black text-white hover:bg-gray-800"
+                  onClick={handleAdvancedFilter}
+                >
+                  Filter Lanjutan
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Popular Policies Section - Mirip BPK */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Selamat Datang</h1>
-        <p className="text-gray-600">Akses dan kelola kebijakan perusahaan dengan mudah</p>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold text-gray-900">Kebijakan Terpopuler 2 Minggu Terakhir</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {recentPolicies.slice(0, 3).map((policy, index) => (
+            <Card key={policy.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="bg-blue-100 rounded-lg p-2">
+                    <span className="text-2xl font-bold text-blue-600">{index + 1}</span>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 text-sm leading-tight">{policy.title}</h3>
+                    <p className="text-xs text-gray-500 mt-1">{policy.policyNumber}</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <Badge variant="secondary" className="text-xs">{policy.category}</Badge>
+                  <Button size="sm" variant="outline" onClick={() => handleViewPolicy(policy)}>
+                    <Eye className="h-3 w-3 mr-1" />
+                    Lihat
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Kebijakan Aktif</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">24</div>
-            <p className="text-xs text-muted-foreground">
-              +2 dari bulan lalu
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Belum Dikonfirmasi</CardTitle>
-            <Bell className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">3</div>
-            <p className="text-xs text-muted-foreground">
-              Perlu konfirmasi pembacaan
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Kategori</CardTitle>
-            <Filter className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">
-              Kategori kebijakan
-            </p>
-          </CardContent>
-        </Card>
+      {/* Policy Categories - Sesuai Konteks Sekolah */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Klasifikasi Kebijakan</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-blue-500">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <FileText className="h-8 w-8 text-blue-600" />
+                <Badge variant="outline" className="text-xs">Lihat Statistik</Badge>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Kebijakan Akademik</h3>
+              <p className="text-sm text-gray-600 mb-4">Kumpulan kebijakan pembelajaran, kurikulum, dan evaluasi siswa</p>
+              <Button className="w-full" variant="outline">
+                Lihat Kebijakan
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-green-500">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <FileText className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Kebijakan Keamanan & K3</h3>
+              <p className="text-sm text-gray-600 mb-4">Kumpulan kebijakan keselamatan, kesehatan kerja, dan keamanan sekolah</p>
+              <Button className="w-full" variant="outline">
+                Lihat Kebijakan
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-purple-500">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <FileText className="h-8 w-8 text-purple-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Kebijakan Teknologi & IT</h3>
+              <p className="text-sm text-gray-600 mb-4">Kumpulan kebijakan penggunaan teknologi, sistem informasi, dan digitalisasi</p>
+              <Button className="w-full" variant="outline">
+                Lihat Kebijakan
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-orange-500">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <FileText className="h-8 w-8 text-orange-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Kebijakan Administrasi & SDM</h3>
+              <p className="text-sm text-gray-600 mb-4">Kumpulan kebijakan kepegawaian, administrasi, dan pengembangan SDM</p>
+              <Button className="w-full" variant="outline">
+                Lihat Kebijakan
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Recent Policies & Input - Mirip BPK 2 Kolom */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Recent Policies */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <FileText className="mr-2 h-5 w-5" />
-              Kebijakan Terbaru
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center">
+                <FileText className="mr-2 h-5 w-5" />
+                Kebijakan Terbaru
+              </CardTitle>
+              <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
+                Lihat lebih →
+              </Button>
+            </div>
             <CardDescription>
-              Kebijakan yang baru diterbitkan atau diperbarui
+              Kebijakan yang baru diundangkan
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {recentPolicies.map((policy) => (
-                <div key={policy.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={policy.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <FileText className="h-5 w-5 text-blue-600 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-medium text-gray-900 truncate">
                       {policy.title}
@@ -640,75 +838,97 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
                       <Badge variant="secondary" className="text-xs">
                         {policy.category}
                       </Badge>
-                      <span className="text-xs text-gray-500 flex items-center">
-                        <Hash className="h-3 w-3 mr-1" />
-                        {policy.policyNumber}
+                      <span className="text-xs text-gray-500">
+                        Diundangkan {Math.floor(Math.random() * 30) + 1} hari yang lalu
                       </span>
                     </div>
-                    <div className="flex items-center mt-1 text-xs text-gray-500">
-                      <Calendar className="h-3 w-3 mr-1" />
-                      Berlaku: {new Date(policy.effectiveDate).toLocaleDateString('id-ID')}
-                    </div>
                   </div>
-                  <div className="flex space-x-2 ml-4">
-                    <Button size="sm" variant="outline" onClick={() => handleViewPolicy(policy)}>
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="outline">
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <Button size="sm" variant="ghost" onClick={() => handleViewPolicy(policy)}>
+                    <Eye className="h-4 w-4" />
+                  </Button>
                 </div>
               ))}
             </div>
-            <Button className="w-full mt-4" variant="outline" onClick={() => setActiveMenuItem('policies')}>
-              Lihat Semua Kebijakan
-            </Button>
           </CardContent>
         </Card>
 
-        {/* Notifications */}
+        {/* Recent Input */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Bell className="mr-2 h-5 w-5" />
-              Notifikasi
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center">
+                <FileText className="mr-2 h-5 w-5" />
+                Input Terbaru
+              </CardTitle>
+              <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
+                Lihat lebih →
+              </Button>
+            </div>
             <CardDescription>
-              Pemberitahuan terkait kebijakan
+              Dokumen yang baru ditambahkan ke sistem
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {notifications.map((notification) => (
-                <div key={notification.id} className="p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-                  <h4 className="text-sm font-medium text-blue-900">
-                    {notification.title}
-                  </h4>
-                  <p className="text-sm text-blue-700 mt-1">
-                    {notification.message}
-                  </p>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-blue-600 flex items-center">
-                      <Clock className="h-3 w-3 mr-1" />
-                      {new Date(notification.date).toLocaleDateString('id-ID')}
-                    </span>
-                    <Button size="sm" variant="ghost" className="text-blue-600 hover:text-blue-800">
-                      <CheckCircle className="h-4 w-4" />
-                    </Button>
+            <div className="space-y-3">
+              {allPolicies.slice(0, 3).map((policy) => (
+                <div key={policy.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <FileText className="h-5 w-5 text-green-600 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-medium text-gray-900 truncate">
+                      {policy.title}
+                    </h4>
+                    <div className="flex items-center mt-1 space-x-2">
+                      <Badge variant="secondary" className="text-xs">
+                        {policy.category}
+                      </Badge>
+                      <span className="text-xs text-gray-500">
+                        Diinput {Math.floor(Math.random() * 24) + 1} jam yang lalu
+                      </span>
+                    </div>
                   </div>
+                  <Button size="sm" variant="ghost" onClick={() => handleViewPolicy(policy)}>
+                    <Eye className="h-4 w-4" />
+                  </Button>
                 </div>
               ))}
             </div>
-            <Button className="w-full mt-4" variant="outline">
-              Lihat Semua Notifikasi
-            </Button>
           </CardContent>
         </Card>
       </div>
 
+      {/* Web Statistics - Mirip BPK */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="text-center text-2xl font-bold text-gray-900">Statistik Web</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+            <div>
+              <div className="text-3xl font-bold text-blue-600 mb-2">77,78 ribu</div>
+              <div className="text-sm text-gray-600">Pengunjung Kemarin</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-green-600 mb-2">2,60 juta</div>
+              <div className="text-sm text-gray-600">Pengunjung Sebulan Terakhir</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-purple-600 mb-2">28,95 juta</div>
+              <div className="text-sm text-gray-600">Pengunjung Setahun Terakhir</div>
+            </div>
+          </div>
+          <div className="text-center mt-6 p-4 bg-gray-50 rounded-lg">
+            <p className="text-sm text-gray-600">
+              <strong>Update terakhir:</strong> 15 Agustus 2025 09.00
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              Dalam 7 hari terakhir rata-rata jumlah pengunjung harian sebanyak 78,99 ribu.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Quick Search */}
-      <Card className="mt-6">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
             <Search className="mr-2 h-5 w-5" />
@@ -738,116 +958,208 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
 
   const renderPolicies = () => (
     <>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Daftar Kebijakan</h1>
-        <p className="text-gray-600">Temukan dan akses semua kebijakan perusahaan</p>
+      {/* Hero Section - Mirip BPK */}
+      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 rounded-xl p-8 text-white shadow-lg mb-8">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">📋 DAFTAR KEBIJAKAN</h1>
+          <p className="text-xl text-blue-100 mb-6">Temukan dan akses semua kebijakan Telkom Schools</p>
+          <div className="flex items-center justify-center space-x-4 text-sm">
+            <div className="flex items-center space-x-2">
+              <FileText className="h-4 w-4" />
+              <span>{filteredPolicies.length} kebijakan tersedia</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="h-4 w-4" />
+              <span>Semua kebijakan aktif</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Filters */}
-      <Card className="mb-6">
+      {/* Enhanced Search & Filters - Mirip BPK */}
+      <Card className="shadow-lg border-0 bg-gradient-to-r from-gray-50 to-white mb-8">
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Filter className="mr-2 h-5 w-5" />
-            Filter & Pencarian
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Search className="h-5 w-5 text-blue-600" />
+              <CardTitle className="text-xl">Cari & Filter</CardTitle>
+            </div>
+            <Badge variant="outline" className="bg-blue-50 text-blue-700">
+              {filteredPolicies.length} hasil
+            </Badge>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <Label htmlFor="search">Pencarian</Label>
+          <div className="space-y-4">
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <Input
-                id="search"
-                placeholder="Cari kebijakan..."
+                type="text"
+                placeholder="Cari kebijakan berdasarkan judul, kategori, atau nomor dokumen..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 h-12 text-lg border-2 focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
-            <div>
-              <Label htmlFor="category">Kategori</Label>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih kategori" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Kategori</SelectItem>
-                  <SelectItem value="Akademik">Akademik</SelectItem>
-                  <SelectItem value="Keselamatan">Keselamatan</SelectItem>
-                  <SelectItem value="Teknologi">Teknologi</SelectItem>
-                  <SelectItem value="SDM">SDM</SelectItem>
-                  <SelectItem value="Keuangan">Keuangan</SelectItem>
-                </SelectContent>
-              </Select>
+            
+            {/* Filter Options */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="category" className="text-sm font-medium">Kategori</Label>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Pilih kategori" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Kategori</SelectItem>
+                    <SelectItem value="Akademik">Akademik</SelectItem>
+                    <SelectItem value="Keselamatan">Keselamatan</SelectItem>
+                    <SelectItem value="Teknologi">Teknologi</SelectItem>
+                    <SelectItem value="SDM">SDM</SelectItem>
+                    <SelectItem value="Keuangan">Keuangan</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="year" className="text-sm font-medium">Tahun</Label>
+                <Select value={selectedYear} onValueChange={setSelectedYear}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Pilih tahun" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Tahun</SelectItem>
+                    <SelectItem value="2024">2024</SelectItem>
+                    <SelectItem value="2023">2023</SelectItem>
+                    <SelectItem value="2022">2022</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-end">
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedCategory('all');
+                    setSelectedYear('all');
+                  }}
+                >
+                  Reset Filter
+                </Button>
+              </div>
             </div>
-            <div>
-              <Label htmlFor="year">Tahun</Label>
-              <Select value={selectedYear} onValueChange={setSelectedYear}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih tahun" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Tahun</SelectItem>
-                  <SelectItem value="2024">2024</SelectItem>
-                  <SelectItem value="2023">2023</SelectItem>
-                  <SelectItem value="2022">2022</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-end">
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => {
-                  setSearchQuery('');
-                  setSelectedCategory('all');
-                  setSelectedYear('all');
-                }}
-              >
-                Reset Filter
-              </Button>
+
+            {/* Quick Filter Badges */}
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="cursor-pointer hover:bg-blue-100">Semua Kategori</Badge>
+              <Badge variant="secondary" className="cursor-pointer hover:bg-blue-100">Teknologi</Badge>
+              <Badge variant="secondary" className="cursor-pointer hover:bg-blue-100">Keamanan</Badge>
+              <Badge variant="secondary" className="cursor-pointer hover:bg-blue-100">Pendidikan</Badge>
+              <Badge variant="secondary" className="cursor-pointer hover:bg-blue-100">Administrasi</Badge>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Policies List */}
-      <div className="grid grid-cols-1 gap-4">
-        {filteredPolicies.map((policy) => (
-          <Card key={policy.id} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Badge variant="secondary">{policy.category}</Badge>
-                    <Badge variant="outline">{policy.status === 'active' ? 'Aktif' : 'Tidak Aktif'}</Badge>
+      {/* Enhanced Policies List - Mirip BPK */}
+      <Card className="shadow-lg">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <FileText className="h-5 w-5 text-blue-600" />
+              <CardTitle className="text-xl">Semua Kebijakan</CardTitle>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                {filteredPolicies.length} kebijakan
+              </Badge>
+            </div>
+          </div>
+          <CardDescription>Daftar lengkap kebijakan Telkom Schools yang dapat Anda akses</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {filteredPolicies.map((policy, index) => (
+              <div key={policy.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-200 bg-gradient-to-r from-white to-gray-50">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className="bg-blue-100 rounded-lg p-2">
+                        <FileText className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg text-gray-900">{policy.title}</h3>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <Badge variant="secondary" className="text-xs">
+                            {policy.category}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                            {policy.status === 'active' ? 'Aktif' : 'Draft'}
+                          </Badge>
+                          <span className="text-xs text-gray-500">#{index + 1}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-gray-600 mb-4 leading-relaxed">{policy.description}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                      <div className="flex items-center space-x-2">
+                        <Hash className="h-4 w-4 text-gray-400" />
+                        <span className="text-gray-600">Nomor:</span>
+                        <span className="font-medium">{policy.policyNumber}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Calendar className="h-4 w-4 text-gray-400" />
+                        <span className="text-gray-600">Berlaku:</span>
+                        <span className="font-medium">{new Date(policy.effectiveDate).toLocaleDateString('id-ID')}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <User className="h-4 w-4 text-gray-400" />
+                        <span className="text-gray-600">Penulis:</span>
+                        <span className="font-medium">{policy.createdBy || 'Tidak tersedia'}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Clock className="h-4 w-4 text-gray-400" />
+                        <span className="text-gray-600">Update:</span>
+                        <span className="font-medium">{new Date(policy.lastUpdated).toLocaleDateString('id-ID')}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-6 text-sm text-gray-500 mt-3">
+                      <span className="flex items-center">
+                        <Eye className="h-4 w-4 mr-1" />
+                        {policy.totalViews || 0} dilihat
+                      </span>
+                      <span className="flex items-center">
+                        <Download className="h-4 w-4 mr-1" />
+                        {policy.totalDownloads || 0} diunduh
+                      </span>
+                      <span className="flex items-center">
+                        <CheckCircle className="h-4 w-4 mr-1" />
+                        {policy.confirmations || 0} konfirmasi
+                      </span>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{policy.title}</h3>
-                  <p className="text-gray-600 mb-3">{policy.description}</p>
-                  <div className="flex items-center space-x-4 text-sm text-gray-500">
-                    <span className="flex items-center">
-                      <Hash className="h-4 w-4 mr-1" />
-                      {policy.policyNumber}
-                    </span>
-                    <span className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      Berlaku: {new Date(policy.effectiveDate).toLocaleDateString('id-ID')}
-                    </span>
+                  <div className="flex flex-col space-y-2 ml-4">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => handleViewPolicy(policy)}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Lihat Detail
+                    </Button>
+                    <Button variant="outline" size="sm" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                      <Download className="h-4 w-4 mr-2" />
+                      Unduh PDF
+                    </Button>
                   </div>
-                </div>
-                <div className="flex space-x-2 ml-4">
-                  <Button size="sm" variant="outline" onClick={() => handleViewPolicy(policy)}>
-                    <Eye className="h-4 w-4 mr-2" />
-                    Lihat
-                  </Button>
-                  <Button size="sm" variant="outline">
-                    <Download className="h-4 w-4 mr-2" />
-                    Unduh
-                  </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {filteredPolicies.length === 0 && (
         <Card>
@@ -861,91 +1173,61 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
     </>
   );
 
-  const renderRevokedPolicies = () => (
-    <>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Kebijakan yang Dicabut</h1>
-        <p className="text-gray-600">Daftar kebijakan yang sudah tidak berlaku</p>
-      </div>
 
-      <div className="grid grid-cols-1 gap-4">
-        {revokedPolicies.map((policy) => (
-          <Card key={policy.id} className="border-red-200 bg-red-50">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Badge variant="secondary">{policy.category}</Badge>
-                    <Badge variant="destructive">Dicabut</Badge>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{policy.title}</h3>
-                  <div className="bg-red-100 p-3 rounded-lg mb-3">
-                    <p className="text-sm text-red-800">
-                      <strong>Alasan pencabutan:</strong> {policy.reason}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-4 text-sm text-gray-500">
-                    <span className="flex items-center">
-                      <Hash className="h-4 w-4 mr-1" />
-                      {policy.policyNumber}
-                    </span>
-                    <span className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      Dicabut: {new Date(policy.revokedDate).toLocaleDateString('id-ID')}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex space-x-2 ml-4">
-                  <Button size="sm" variant="outline" disabled>
-                    <Eye className="h-4 w-4 mr-2" />
-                    Lihat
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </>
-  );
 
   const renderContact = () => (
     <>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Kontak Admin Kebijakan</h1>
-        <p className="text-gray-600">Hubungi tim pengelola kebijakan untuk bantuan dan informasi</p>
+      {/* Hero Section - Mirip BPK */}
+      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 rounded-xl p-8 text-white shadow-lg mb-8">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">📞 KONTAK ADMIN KEBIJAKAN</h1>
+          <p className="text-xl text-blue-100 mb-6">Hubungi tim pengelola kebijakan untuk bantuan dan dukungan teknis</p>
+          <div className="flex items-center justify-center space-x-6 text-sm">
+            <div className="flex items-center space-x-2">
+              <Phone className="h-4 w-4" />
+              <span>Dukungan 24/7</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Mail className="h-4 w-4" />
+              <span>Email & Chat</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Admin Team Grid - Mirip BPK */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {adminContacts.map((contact, index) => (
-          <Card key={index} className="hover:shadow-md transition-shadow">
+          <Card key={index} className="hover:shadow-lg transition-shadow border-l-4 border-l-blue-500">
             <CardContent className="p-6">
               <div className="text-center mb-4">
-                <Avatar className="h-16 w-16 mx-auto mb-3">
+                <Avatar className="h-20 w-20 mx-auto mb-3">
                   <AvatarImage src={`https://images.unsplash.com/photo-${1500000000000 + index}?w=100&h=100&fit=crop&crop=face`} />
-                  <AvatarFallback>{contact.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                  <AvatarFallback className="text-lg">{contact.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                 </Avatar>
                 <h3 className="text-lg font-semibold text-gray-900">{contact.name}</h3>
                 <p className="text-sm text-gray-600">{contact.position}</p>
-                <Badge variant="outline" className="mt-1">{contact.department}</Badge>
+                <Badge variant="outline" className="mt-2 bg-blue-50 text-blue-700 border-blue-200">
+                  {contact.department}
+                </Badge>
               </div>
               <Separator className="my-4" />
               <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <Mail className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm text-gray-600">{contact.email}</span>
+                <div className="flex items-center space-x-3 p-2 bg-blue-50 rounded-lg">
+                  <Mail className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm text-blue-700 font-medium">{contact.email}</span>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <Phone className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm text-gray-600">{contact.phone}</span>
+                <div className="flex items-center space-x-3 p-2 bg-green-50 rounded-lg">
+                  <Phone className="h-4 w-4 text-green-600" />
+                  <span className="text-sm text-green-700 font-medium">{contact.phone}</span>
                 </div>
               </div>
               <div className="mt-4 space-y-2">
-                <Button className="w-full" size="sm">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700" size="sm">
                   <Mail className="h-4 w-4 mr-2" />
                   Kirim Email
                 </Button>
-                <Button variant="outline" className="w-full" size="sm">
+                <Button variant="outline" className="w-full border-green-200 text-green-700 hover:bg-green-50" size="sm">
                   <Phone className="h-4 w-4 mr-2" />
                   Hubungi
                 </Button>
@@ -986,18 +1268,243 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
     </>
   );
 
+  const renderVersions = () => (
+    <>
+      {/* Hero Section - Mirip BPK */}
+      <div className="bg-gradient-to-r from-green-600 via-green-700 to-green-800 rounded-xl p-8 text-white shadow-lg mb-8">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">🔄 VERSI KEBIJAKAN</h1>
+          <p className="text-xl text-green-100 mb-6">Lihat dan bandingkan berbagai versi kebijakan Telkom Schools</p>
+          <div className="flex items-center justify-center space-x-6 text-sm">
+            <div className="flex items-center space-x-2">
+              <FileText className="h-4 w-4" />
+              <span>Total Versi: 24</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Clock className="h-4 w-4" />
+              <span>Update Terakhir: 2 hari lalu</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Search & Filter Section */}
+      <Card className="shadow-lg border-0 bg-gradient-to-r from-gray-50 to-white mb-8">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Search className="h-5 w-5 text-green-600" />
+              <CardTitle className="text-xl">Cari & Filter Versi</CardTitle>
+            </div>
+            <Badge variant="outline" className="bg-green-50 text-green-700">
+              {policyVersions.length} versi tersedia
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Cari kebijakan berdasarkan judul, kategori, atau nomor dokumen..."
+                value={versionSearchQuery}
+                onChange={(e) => setVersionSearchQuery(e.target.value)}
+                className="pl-10 h-12 text-lg border-2 focus:border-green-500 focus:ring-green-500"
+              />
+            </div>
+            
+            {/* Filter Options */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="versionCategory" className="text-sm font-medium">Kategori</Label>
+                <Select value={versionSelectedCategory} onValueChange={setVersionSelectedCategory}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Pilih kategori" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Kategori</SelectItem>
+                    <SelectItem value="Akademik">Akademik</SelectItem>
+                    <SelectItem value="Keselamatan">Keselamatan</SelectItem>
+                    <SelectItem value="Teknologi">Teknologi</SelectItem>
+                    <SelectItem value="SDM">SDM</SelectItem>
+                    <SelectItem value="Keuangan">Keuangan</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="versionYear" className="text-sm font-medium">Tahun</Label>
+                <Select value={versionSelectedYear} onValueChange={setVersionSelectedYear}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Pilih tahun" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Tahun</SelectItem>
+                    <SelectItem value="2024">2024</SelectItem>
+                    <SelectItem value="2023">2023</SelectItem>
+                    <SelectItem value="2022">2022</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-end">
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => {
+                    setVersionSearchQuery('');
+                    setVersionSelectedCategory('all');
+                    setVersionSelectedYear('all');
+                  }}
+                >
+                  Reset Filter
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Policy Versions List */}
+      <Card className="shadow-lg">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <GitBranch className="h-5 w-5 text-green-600" />
+              <CardTitle className="text-xl">Semua Versi Kebijakan</CardTitle>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Badge variant="outline" className="bg-green-50 text-green-700">
+                {filteredPolicyVersions.length} versi
+              </Badge>
+            </div>
+          </div>
+          <CardDescription>Daftar lengkap versi kebijakan yang dapat Anda akses dan bandingkan</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {filteredPolicyVersions.map((version, index) => (
+              <div key={version.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-200 bg-gradient-to-r from-white to-gray-50">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className="bg-green-100 rounded-lg p-2">
+                        <GitBranch className="h-5 w-5 text-green-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg text-gray-900">{version.title}</h3>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <Badge variant="secondary" className="text-xs">
+                            {version.category}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                            v{version.versionNumber}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                            {version.status === 'active' ? 'Aktif' : 'Draft'}
+                          </Badge>
+                          <span className="text-xs text-gray-500">#{index + 1}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-gray-600 mb-4 leading-relaxed">{version.description}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                      <div className="flex items-center space-x-2">
+                        <Hash className="h-4 w-4 text-gray-400" />
+                        <span className="text-gray-600">Nomor:</span>
+                        <span className="font-medium">{version.policyNumber}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Calendar className="h-4 w-4 text-gray-400" />
+                        <span className="text-gray-600">Dibuat:</span>
+                        <span className="font-medium">{new Date(version.createdDate).toLocaleDateString('id-ID')}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <User className="h-4 w-4 text-gray-400" />
+                        <span className="text-gray-600">Penulis:</span>
+                        <span className="font-medium">{version.createdBy || 'Tidak tersedia'}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Clock className="h-4 w-4 text-gray-400" />
+                        <span className="text-gray-600">Update:</span>
+                        <span className="font-medium">{new Date(version.lastUpdated).toLocaleDateString('id-ID')}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-6 text-sm text-gray-500 mt-3">
+                      <span className="flex items-center">
+                        <Eye className="h-4 w-4 mr-1" />
+                        {version.totalViews || 0} dilihat
+                      </span>
+                      <span className="flex items-center">
+                        <Download className="h-4 w-4 mr-1" />
+                        {version.totalDownloads || 0} diunduh
+                      </span>
+                      <span className="flex items-center">
+                        <CheckCircle className="h-4 w-4 mr-1" />
+                        {version.confirmations || 0} konfirmasi
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col space-y-2 ml-4">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => handleViewVersion(version)}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Lihat Detail
+                    </Button>
+                    <Button variant="outline" size="sm" className="border-green-200 text-green-700 hover:bg-green-50">
+                      <Download className="h-4 w-4 mr-2" />
+                      Unduh PDF
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {filteredPolicyVersions.length === 0 && (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <GitBranch className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Tidak ada versi kebijakan ditemukan</h3>
+            <p className="text-gray-600">Coba ubah filter atau kata kunci pencarian Anda</p>
+          </CardContent>
+        </Card>
+      )}
+    </>
+  );
+
   const renderProfile = () => (
     <>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Profil Saya</h1>
-        <p className="text-gray-600">Kelola informasi profil dan pengaturan akun Anda</p>
+      {/* Hero Section - Mirip BPK */}
+      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 rounded-xl p-8 text-white shadow-lg mb-8">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">👤 PROFIL SAYA</h1>
+          <p className="text-xl text-blue-100 mb-6">Kelola informasi profil dan pengaturan akun Anda</p>
+          <div className="flex items-center justify-center space-x-6 text-sm">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="h-4 w-4" />
+              <span>Status: Aktif</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Clock className="h-4 w-4" />
+              <span>Login terakhir: Hari ini</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2">
-          <CardHeader>
+        {/* Main Profile Card */}
+        <Card className="lg:col-span-2 shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200">
             <CardTitle className="flex items-center justify-between">
-              <span className="flex items-center">
+              <span className="flex items-center text-blue-900">
                 <User className="mr-2 h-5 w-5" />
                 Informasi Pribadi
               </span>
@@ -1005,6 +1512,7 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
                 variant="outline"
                 size="sm"
                 onClick={() => setIsEditingProfile(!isEditingProfile)}
+                className="border-blue-200 text-blue-700 hover:bg-blue-50"
               >
                 {isEditingProfile ? (
                   <>
@@ -1020,65 +1528,80 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
               </Button>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="p-6">
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="name">Nama Lengkap</Label>
+                  <Label htmlFor="name" className="text-sm font-medium text-gray-700">Nama Lengkap</Label>
                   {isEditingProfile ? (
                     <Input
                       id="name"
                       value={profileData.name}
                       onChange={(e) => setProfileData({...profileData, name: e.target.value})}
+                      className="mt-2 border-2 focus:border-blue-500 focus:ring-blue-500"
                     />
                   ) : (
-                    <p className="mt-1 text-sm text-gray-900">{profileData.name}</p>
+                    <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                      <p className="text-gray-900 font-medium">{profileData.name}</p>
+                    </div>
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="employeeId">ID Pegawai</Label>
-                  <p className="mt-1 text-sm text-gray-900">{profileData.employeeId}</p>
+                  <Label htmlFor="employeeId" className="text-sm font-medium text-gray-700">ID Pegawai</Label>
+                  <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <p className="text-blue-900 font-medium">{profileData.employeeId}</p>
+                  </div>
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="email">Email</Label>
-                  <p className="mt-1 text-sm text-gray-900">{profileData.email}</p>
+                  <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
+                  <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                    <p className="text-gray-900 font-medium">{profileData.email}</p>
+                  </div>
                 </div>
                 <div>
-                  <Label htmlFor="phone">Nomor Telepon</Label>
+                  <Label htmlFor="phone" className="text-sm font-medium text-gray-700">Nomor Telepon</Label>
                   {isEditingProfile ? (
                     <Input
                       id="phone"
                       value={profileData.phone}
                       onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
+                      className="mt-2 border-2 focus:border-blue-500 focus:ring-blue-500"
                     />
                   ) : (
-                    <p className="mt-1 text-sm text-gray-900">{profileData.phone}</p>
+                    <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                      <p className="text-gray-900 font-medium">{profileData.phone}</p>
+                    </div>
                   )}
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="department">Departemen</Label>
-                  <p className="mt-1 text-sm text-gray-900">{profileData.department}</p>
+                  <Label htmlFor="department" className="text-sm font-medium text-gray-700">Departemen</Label>
+                  <div className="mt-2 p-3 bg-green-50 rounded-lg border border-green-200">
+                    <p className="text-green-900 font-medium">{profileData.department}</p>
+                  </div>
                 </div>
                 <div>
-                  <Label htmlFor="position">Posisi</Label>
+                  <Label htmlFor="position" className="text-sm font-medium text-gray-700">Posisi</Label>
                   {isEditingProfile ? (
                     <Input
                       id="position"
                       value={profileData.position}
                       onChange={(e) => setProfileData({...profileData, position: e.target.value})}
+                      className="mt-2 border-2 focus:border-blue-500 focus:ring-blue-500"
                     />
                   ) : (
-                    <p className="mt-1 text-sm text-gray-900">{profileData.position}</p>
+                    <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                      <p className="text-gray-900 font-medium">{profileData.position}</p>
+                    </div>
                   )}
                 </div>
               </div>
               {isEditingProfile && (
-                <div className="flex space-x-2 pt-4">
-                  <Button onClick={handleProfileSave}>
+                <div className="flex space-x-3 pt-6 border-t border-gray-200">
+                  <Button onClick={handleProfileSave} className="bg-blue-600 hover:bg-blue-700">
                     <Save className="h-4 w-4 mr-2" />
                     Simpan Perubahan
                   </Button>
@@ -1091,40 +1614,68 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
           </CardContent>
         </Card>
 
+        {/* Sidebar Cards */}
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Foto Profil</CardTitle>
+          {/* Profile Photo */}
+          <Card className="shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100 border-b border-purple-200">
+              <CardTitle className="text-purple-900">Foto Profil</CardTitle>
             </CardHeader>
-            <CardContent className="text-center">
-              <Avatar className="h-24 w-24 mx-auto mb-4">
+            <CardContent className="text-center p-6">
+              <Avatar className="h-24 w-24 mx-auto mb-4 border-4 border-purple-200">
                 <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face" />
-                <AvatarFallback>{profileData.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                <AvatarFallback className="text-2xl bg-purple-100 text-purple-700">
+                  {profileData.name.split(' ').map(n => n[0]).join('')}
+                </AvatarFallback>
               </Avatar>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="border-purple-200 text-purple-700 hover:bg-purple-50">
                 Ubah Foto
               </Button>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Statistik Aktivitas</CardTitle>
+          {/* Activity Statistics */}
+          <Card className="shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-green-50 to-green-100 border-b border-green-200">
+              <CardTitle className="text-green-900">Statistik Aktivitas</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                  <span className="text-sm text-green-700">Kebijakan Dibaca</span>
+                  <span className="text-lg font-bold text-green-800">24</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                  <span className="text-sm text-blue-700">Dokumen Diunduh</span>
+                  <span className="text-lg font-bold text-blue-800">18</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                  <span className="text-sm text-purple-700">Login Terakhir</span>
+                  <span className="text-sm font-medium text-purple-800">Hari ini</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions */}
+          <Card className="shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-orange-50 to-orange-100 border-b border-orange-200">
+              <CardTitle className="text-orange-900">Aksi Cepat</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
               <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Kebijakan Dibaca</span>
-                  <span className="text-sm font-medium">24</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Dokumen Diunduh</span>
-                  <span className="text-sm font-medium">18</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Login Terakhir</span>
-                  <span className="text-sm font-medium">Hari ini</span>
-                </div>
+                <Button variant="outline" className="w-full border-blue-200 text-blue-700 hover:bg-blue-50">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Lihat Riwayat
+                </Button>
+                <Button variant="outline" className="w-full border-green-200 text-green-700 hover:bg-green-50">
+                  <Download className="h-4 w-4 mr-2" />
+                  Unduh Laporan
+                </Button>
+                <Button variant="outline" className="w-full border-purple-200 text-purple-700 hover:bg-purple-50">
+                  <Bell className="h-4 w-4 mr-2" />
+                  Pengaturan Notif
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -1133,175 +1684,7 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
     </>
   );
 
-  const renderPolicyDetailModal = () => {
-    if (!selectedPolicy) return null;
 
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-          <div className="p-6">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">{selectedPolicy.title}</h2>
-                <div className="flex items-center space-x-4 text-sm text-gray-600">
-                  <span className="flex items-center">
-                    <Hash className="h-4 w-4 mr-1" />
-                    {selectedPolicy.policyNumber}
-                  </span>
-                  <span className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    Berlaku: {new Date(selectedPolicy.effectiveDate).toLocaleDateString('id-ID')}
-                  </span>
-                  <Badge variant="secondary">{selectedPolicy.category}</Badge>
-                </div>
-              </div>
-              <Button variant="ghost" size="sm" onClick={handleClosePolicyDetail}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* Policy Info Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <Card>
-                <CardContent className="p-4">
-                  <div className="text-sm text-gray-600">Dibuat Oleh</div>
-                  <div className="font-medium">{selectedPolicy.createdBy || 'Tidak tersedia'}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4">
-                  <div className="text-sm text-gray-600">Versi</div>
-                  <div className="font-medium">v{selectedPolicy.version || '1.0'}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4">
-                  <div className="text-sm text-gray-600">Ukuran Dokumen</div>
-                  <div className="font-medium">{selectedPolicy.documentSize || 'Tidak tersedia'}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4">
-                  <div className="text-sm text-gray-600">Status</div>
-                  <Badge variant={selectedPolicy.status === 'active' ? 'default' : 'secondary'}>
-                    {selectedPolicy.status === 'active' ? 'Aktif' : 'Draft'}
-                  </Badge>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Statistics */}
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Statistik Penggunaan</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">{selectedPolicy.totalViews || 0}</div>
-                    <div className="text-sm text-gray-600">Total Views</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">{selectedPolicy.totalDownloads || 0}</div>
-                    <div className="text-sm text-gray-600">Downloads</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-600">{selectedPolicy.confirmations || 0}%</div>
-                    <div className="text-sm text-gray-600">Konfirmasi Pembacaan</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Content */}
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Isi Kebijakan</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="prose max-w-none">
-                  <pre className="whitespace-pre-wrap text-sm text-gray-700 bg-gray-50 p-4 rounded-lg overflow-x-auto">
-                    {selectedPolicy.content}
-                  </pre>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Attachments */}
-            {selectedPolicy.attachments && selectedPolicy.attachments.length > 0 && (
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle>Lampiran</CardTitle>
-                  <CardDescription>Dokumen pendukung terkait kebijakan ini</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {selectedPolicy.attachments.map((attachment: any, index: number) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <FileText className="h-5 w-5 text-gray-400" />
-                          <div>
-                            <div className="font-medium">{attachment.name}</div>
-                            <div className="text-sm text-gray-500">{attachment.size} • {attachment.type}</div>
-                          </div>
-                        </div>
-                        <Button size="sm" variant="outline">
-                          <Download className="h-4 w-4 mr-2" />
-                          Unduh
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Related Policies */}
-            {selectedPolicy.relatedPolicies && selectedPolicy.relatedPolicies.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Kebijakan Terkait</CardTitle>
-                  <CardDescription>Kebijakan lain yang mungkin relevan</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {selectedPolicy.relatedPolicies.map((relatedPolicy: any, index: number) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <FileText className="h-5 w-5 text-blue-400" />
-                          <span className="font-medium">{relatedPolicy}</span>
-                        </div>
-                        <Button size="sm" variant="outline">
-                          <Eye className="h-4 w-4 mr-2" />
-                          Lihat
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex space-x-2 pt-6 border-t">
-              <Button className="flex-1">
-                <Download className="h-4 w-4 mr-2" />
-                Unduh Kebijakan
-              </Button>
-              <Button variant="outline" className="flex-1">
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Konfirmasi Pembacaan
-              </Button>
-              <Button variant="outline" onClick={handleClosePolicyDetail}>
-                Tutup
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -1313,12 +1696,161 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
         <div className="p-8">
           {activeMenuItem === 'dashboard' && renderDashboard()}
           {activeMenuItem === 'policies' && renderPolicies()}
-          {activeMenuItem === 'revoked' && renderRevokedPolicies()}
+          {activeMenuItem === 'versions' && renderVersions()}
           {activeMenuItem === 'contact' && renderContact()}
           {activeMenuItem === 'profile' && renderProfile()}
         </div>
       </div>
-      {showPolicyDetail && renderPolicyDetailModal()}
+
+      {/* Advanced Filter Modal */}
+      <Dialog open={showAdvancedFilter} onOpenChange={setShowAdvancedFilter}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <Filter className="h-5 w-5 text-blue-600" />
+              <span>Filter Lanjutan</span>
+            </DialogTitle>
+            <DialogDescription>
+              Pilih kriteria pencarian yang lebih spesifik untuk menemukan kebijakan yang Anda cari
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            {/* Kategori */}
+            <div className="space-y-2">
+              <Label htmlFor="category">Kategori Kebijakan</Label>
+              <Select 
+                value={advancedFilters.category} 
+                onValueChange={(value) => setAdvancedFilters({...advancedFilters, category: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih kategori" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Kategori</SelectItem>
+                  <SelectItem value="akademik">Akademik</SelectItem>
+                  <SelectItem value="keselamatan">Keamanan & K3</SelectItem>
+                  <SelectItem value="teknologi">Teknologi & IT</SelectItem>
+                  <SelectItem value="administrasi">Administrasi & SDM</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Tahun */}
+            <div className="space-y-2">
+              <Label htmlFor="year">Tahun Terbit</Label>
+              <Select 
+                value={advancedFilters.year} 
+                onValueChange={(value) => setAdvancedFilters({...advancedFilters, year: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih tahun" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Tahun</SelectItem>
+                  <SelectItem value="2024">2024</SelectItem>
+                  <SelectItem value="2023">2023</SelectItem>
+                  <SelectItem value="2022">2022</SelectItem>
+                  <SelectItem value="2021">2021</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Status */}
+            <div className="space-y-2">
+              <Label htmlFor="status">Status Kebijakan</Label>
+              <Select 
+                value={advancedFilters.status} 
+                onValueChange={(value) => setAdvancedFilters({...advancedFilters, status: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Status</SelectItem>
+                  <SelectItem value="active">Aktif</SelectItem>
+                  <SelectItem value="inactive">Tidak Aktif</SelectItem>
+                  <SelectItem value="draft">Draft</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Departemen */}
+            <div className="space-y-2">
+              <Label htmlFor="department">Departemen</Label>
+              <Select 
+                value={advancedFilters.department} 
+                onValueChange={(value) => setAdvancedFilters({...advancedFilters, department: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih departemen" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Departemen</SelectItem>
+                  <SelectItem value="akademik">Akademik</SelectItem>
+                  <SelectItem value="it">IT & Sistem</SelectItem>
+                  <SelectItem value="hr">SDM</SelectItem>
+                  <SelectItem value="finance">Keuangan</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Rentang Tanggal */}
+            <div className="space-y-2">
+              <Label htmlFor="dateRange">Rentang Tanggal</Label>
+              <Select 
+                value={advancedFilters.dateRange} 
+                onValueChange={(value) => setAdvancedFilters({...advancedFilters, dateRange: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih rentang tanggal" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Waktu</SelectItem>
+                  <SelectItem value="today">Hari Ini</SelectItem>
+                  <SelectItem value="week">Minggu Ini</SelectItem>
+                  <SelectItem value="month">Bulan Ini</SelectItem>
+                  <SelectItem value="quarter">3 Bulan Terakhir</SelectItem>
+                  <SelectItem value="year">Tahun Ini</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Urutkan Berdasarkan */}
+            <div className="space-y-2">
+              <Label htmlFor="sortBy">Urutkan Berdasarkan</Label>
+              <Select 
+                value={advancedFilters.sortBy} 
+                onValueChange={(value) => setAdvancedFilters({...advancedFilters, sortBy: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih pengurutan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="relevance">Relevansi</SelectItem>
+                  <SelectItem value="date">Tanggal Terbaru</SelectItem>
+                  <SelectItem value="title">Judul A-Z</SelectItem>
+                  <SelectItem value="views">Paling Banyak Dilihat</SelectItem>
+                  <SelectItem value="downloads">Paling Banyak Diunduh</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Separator />
+
+            {/* Action Buttons */}
+            <div className="flex justify-end space-x-3">
+              <Button variant="outline" onClick={handleResetFilters}>
+                Reset Filter
+              </Button>
+              <Button onClick={handleApplyFilters} className="bg-blue-600 hover:bg-blue-700">
+                Terapkan Filter
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }
