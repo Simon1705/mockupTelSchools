@@ -998,17 +998,24 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
     <>
       {/* Hero Section - Telkom Red */}
       <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-8 text-white shadow-lg mb-8">
-        <div className="">
-          <h1 className="text-4xl font-bold mb-4">📋 DAFTAR KEBIJAKAN</h1>
-          <p className="text-xl text-red-100 mb-6">Temukan dan akses semua kebijakan Telkom Schools</p>
-          <div className="flex items-center space-x-4 text-sm">
-            <div className="flex items-center space-x-2">
-              <FileText className="h-4 w-4" />
-              <span>{filteredPolicies.length} kebijakan tersedia</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="bg-white/20 rounded-lg p-3">
+              <FileText className="h-8 w-8 text-white" />
             </div>
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="h-4 w-4" />
-              <span>Semua kebijakan aktif</span>
+            <div>
+              <h1 className="text-3xl font-bold mb-1">Daftar Kebijakan</h1>
+              <p className="text-red-100">Temukan dan akses semua kebijakan Telkom Schools</p>
+              <div className="flex items-center space-x-4 mt-2 text-xs">
+                <span className="flex items-center">
+                  <FileText className="h-3 w-3 mr-1 text-white" />
+                  {filteredPolicies.length} kebijakan tersedia
+                </span>
+                <span className="flex items-center">
+                  <CheckCircle className="h-3 w-3 mr-1 text-white" />
+                  Semua kebijakan aktif
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -1217,17 +1224,24 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
     <>
       {/* Hero Section - Telkom Red */}
       <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-8 text-white shadow-lg mb-8">
-        <div className="">
-          <h1 className="text-4xl font-bold mb-4">📞 KONTAK ADMIN KEBIJAKAN</h1>
-          <p className="text-xl text-red-100 mb-6">Hubungi tim pengelola kebijakan untuk bantuan dan dukungan teknis</p>
-          <div className="flex items-center space-x-6 text-sm">
-            <div className="flex items-center space-x-2">
-              <Phone className="h-4 w-4" />
-              <span>Dukungan 24/7</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="bg-white/20 rounded-lg p-3">
+              <Phone className="h-8 w-8 text-white" />
             </div>
-            <div className="flex items-center space-x-2">
-              <Mail className="h-4 w-4" />
-              <span>Email & Chat</span>
+            <div>
+              <h1 className="text-3xl font-bold mb-1">Kontak Admin Kebijakan</h1>
+              <p className="text-red-100">Hubungi tim pengelola kebijakan untuk bantuan dan dukungan teknis</p>
+              <div className="flex items-center space-x-6 mt-2 text-xs">
+                <span className="flex items-center">
+                  <Phone className="h-3 w-3 mr-1 text-white" />
+                  Dukungan 24/7
+                </span>
+                <span className="flex items-center">
+                  <Mail className="h-3 w-3 mr-1 text-white" />
+                  Email & Chat
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -1310,17 +1324,24 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
     <>
       {/* Hero Section - Telkom Red */}
       <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-8 text-white shadow-lg mb-8">
-        <div className="">
-          <h1 className="text-4xl font-bold mb-4">🔄 VERSI KEBIJAKAN</h1>
-          <p className="text-xl text-red-100 mb-6">Lihat dan bandingkan berbagai versi kebijakan Telkom Schools</p>
-          <div className="flex items-center space-x-6 text-sm">
-            <div className="flex items-center space-x-2">
-              <FileText className="h-4 w-4" />
-              <span>Total Versi: 24</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="bg-white/20 rounded-lg p-3">
+              <GitBranch className="h-8 w-8 text-white" />
             </div>
-            <div className="flex items-center space-x-2">
-              <Clock className="h-4 w-4" />
-              <span>Update Terakhir: 2 hari lalu</span>
+            <div>
+              <h1 className="text-3xl font-bold mb-1">Versi Kebijakan</h1>
+              <p className="text-red-100">Lihat dan bandingkan berbagai versi kebijakan Telkom Schools</p>
+              <div className="flex items-center space-x-6 mt-2 text-xs">
+                <span className="flex items-center">
+                  <FileText className="h-3 w-3 mr-1 text-white" />
+                  Total Versi: {policyVersions.length}
+                </span>
+                <span className="flex items-center">
+                  <Clock className="h-3 w-3 mr-1 text-white" />
+                  Update Terakhir: 2 hari lalu
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -1521,17 +1542,24 @@ Mengukur dan meningkatkan kinerja pegawai secara objektif dan berkelanjutan.
     <>
       {/* Hero Section - Mirip BPK */}
       <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-8 text-white shadow-lg mb-8">
-        <div className="">
-          <h1 className="text-4xl font-bold mb-4">👤 PROFIL SAYA</h1>
-          <p className="text-xl text-blue-100 mb-6">Kelola informasi profil dan pengaturan akun Anda</p>
-          <div className="flex items-center space-x-6 text-sm">
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="h-4 w-4" />
-              <span>Status: Aktif</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="bg-white/20 rounded-lg p-3">
+              <User className="h-8 w-8 text-white" />
             </div>
-            <div className="flex items-center space-x-2">
-              <Clock className="h-4 w-4" />
-              <span>Login terakhir: Hari ini</span>
+            <div>
+              <h1 className="text-3xl font-bold mb-1">Profil Saya</h1>
+              <p className="text-red-100">Kelola informasi profil dan pengaturan akun Anda</p>
+              <div className="flex items-center space-x-6 mt-2 text-xs">
+                <span className="flex items-center">
+                  <CheckCircle className="h-3 w-3 mr-1 text-white" />
+                  Status: Aktif
+                </span>
+                <span className="flex items-center">
+                  <Clock className="h-3 w-3 mr-1 text-white" />
+                  Login terakhir: Hari ini
+                </span>
+              </div>
             </div>
           </div>
         </div>
