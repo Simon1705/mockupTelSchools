@@ -487,7 +487,7 @@ export function MeetingMinutes() {
               <Button 
                 variant="outline" 
                 onClick={openUploadModal}
-                className="border-white text-white hover:bg-white/20"
+                className="bg-transparent border-white text-white hover:bg-white/20"
               >
                 <Upload className="h-4 w-4 mr-2" />
                 Upload PDF
@@ -520,16 +520,7 @@ export function MeetingMinutes() {
             <SelectItem value="board">Board</SelectItem>
           </SelectContent>
         </Select>
-        <div className="flex gap-2">
-          <Button onClick={openCreateModal}>
-            <Plus className="h-4 w-4 mr-2" />
-            Buat Notulen
-          </Button>
-          <Button variant="outline" onClick={openUploadModal}>
-            <Upload className="h-4 w-4 mr-2" />
-            Upload PDF
-          </Button>
-        </div>
+        
       </div>
 
       {/* Meeting Minutes List */}
